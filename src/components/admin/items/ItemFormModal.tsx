@@ -1,0 +1,360 @@
+import React, { useState, useEffect } from 'react';
+import type { AdminCategory, AdminItem, AdminKarat } from '../../../services/api';
+import { adminCreateItem, adminUpdateItem, adminFetchKarats } from '../../../services/api';
+import { useToast } from '../../../contexts/ToastContext'; 
+
+interface ItemFormData {
+  code: string;
+  name: string;
+  description: string;
+  weight: number;
+  categoryName: string;
+  karatName: string;
+  factoryPrice: number;
+  imageUrl: string;
+  inStockCount: number;
+  reservedCount: number;
+  isActive: boolean;
+}
+
+interface ItemFormModalProps {
+  showForm: boolean;
+  editingItem: AdminItem | null;
+  categories: AdminCategory[];
+  onClose: () => void;
+  onSubmitSuccess: (page: number, categoryFilter: string) => Promise<void>;
+  page: number;
+  categoryFilter: string;
+  modalError: string;
+  setModalError: (error: string) => void;
+}
+
+const ItemFormModal: React.FC<ItemFormModalProps> = ({
+  showForm,
+  editingItem,
+  categories,
+  onClose,
+  onSubmitSuccess,
+  page,
+  categoryFilter,
+  modalError,
+  setModalError
+}) => {
+  const [formData, setFormData] = useState<ItemFormData>({
+    code: '',
+    name: '',
+    description: '',
+    weight: 0,
+    categoryName: '',
+    karatName: '',
+    factoryPrice: 0,
+    imageUrl: '',
+    inStockCount: 0,
+    reservedCount: 0,
+    isActive: true,
+  });
+  const [karats, setKarats] = useState<AdminKarat[]>([]);
+  const [karatsLoading, setKaratsLoading] = useState(true);
+  const [submitLoading, setSubmitLoading] = useState(false);
+
+  // ✅ TOAST HOOK
+  const { addToast } = useToast();
+
+  // ✅ FETCH KARATS
+  useEffect(() => {
+    const fetchKarats = async () => {
+      try {
+        setKaratsLoading(true);
+        const data = await adminFetchKarats({ page: 0, size: 20 });
+        setKarats(data.content || []);
+      } catch (err: any) {
+        console.error('Failed to fetch karats:', err);
+        setKarats([]);
+      } finally {
+        setKaratsLoading(false);
+      }
+    };
+    fetchKarats();
+  }, []);
+
+  useEffect(() => {
+    if (editingItem) {
+      setFormData({
+        code: editingItem.code,
+        name: editingItem.name,
+        description: editingItem.description || '',
+        weight: editingItem.weight,
+        categoryName: editingItem.category.name,
+        karatName: editingItem.karat.name,
+        factoryPrice: editingItem.factoryPrice,
+        imageUrl: editingItem.imageUrl,
+        inStockCount: editingItem.inStockCount,
+        reservedCount: editingItem.reservedCount,
+        isActive: editingItem.isActive,
+      });
+    } else {
+      setFormData({
+        code: '', name: '', description: '', weight: 0, categoryName: '',
+        karatName: '', factoryPrice: 0, imageUrl: '', inStockCount: 0, 
+        reservedCount: 0, isActive: true
+      });
+    }
+  }, [editingItem]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitLoading(true);
+    setModalError(''); // ✅ Clear modal error
+
+    console.log('🚀 SUBMIT CLICKED:', { editingItemId: editingItem?.id, formData });
+
+    try {
+      // VALIDATION CHECKS
+      if (!formData.code.trim()) throw new Error('Item code is required');
+      if (!formData.name.trim()) throw new Error('Item name is required');
+      if (!formData.categoryName) throw new Error('Please select a category');
+      if (!formData.karatName) throw new Error('Please select a karat');
+      if (!formData.imageUrl.trim()) throw new Error('Image URL is required');
+
+      if (editingItem && (!editingItem.id || editingItem.id <= 0)) {
+        throw new Error('Invalid item ID. Please try again.');
+      }
+
+      const submitData = {
+        ...formData,
+        weight: parseFloat(formData.weight.toString()) || 0,
+        factoryPrice: parseFloat(formData.factoryPrice.toString()) || 0,
+        inStockCount: parseInt(formData.inStockCount.toString()) || 0,
+        reservedCount: parseInt(formData.reservedCount.toString()) || 0,
+      };
+
+      if (editingItem) {
+        await adminUpdateItem(editingItem.id!, submitData);
+        addToast(`"${formData.name}" updated successfully.`, 'success');
+      } else {
+        await adminCreateItem(submitData);
+        addToast(`"${formData.name}" created successfully.`, 'success');
+      }
+
+      console.log('SUCCESS!');
+      onClose();
+      await onSubmitSuccess(page, categoryFilter);
+    } catch (err: any) {
+      console.error('ERROR:', err);
+      
+      let errorMsg = 'Operation failed';      
+      if (err.response?.data?.status?.description) {
+        errorMsg = err.response.data.status.description; 
+      } else if (err.response?.data?.detail) {
+        errorMsg = err.response.data.detail;
+      } else if (err.response?.data?.message) {
+        errorMsg = err.response.data.message;
+      } else if (err.message) {
+        errorMsg = err.message;
+      }
+      
+      setModalError(errorMsg); 
+    } finally {
+      setSubmitLoading(false);
+    }
+  };
+
+  if (!showForm) return null;
+
+  return (
+    <div className="fixed inset-0 bg-gray-500/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
+      <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-4xl w-full mx-4 max-h-[95vh] overflow-y-auto border border-gray-200">
+        <div className="p-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-3xl font-black bg-gray-900 bg-clip-text text-transparent">
+              {editingItem ? `Edit ${editingItem.name}` : 'Create New Item'}
+            </h2>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-200 rounded-xl transition-colors"
+            >
+              <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* ✅ BEAUTIFUL MODAL ERROR DISPLAY */}
+          {modalError && (
+            <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 bg-gradient-to-r from-red-50/90 to-red-100/50 backdrop-blur-sm rounded-2xl text-red-900 text-sm shadow-lg">
+              <div className="flex items-start gap-3">
+                <span className="text-lg font-bold mt-0.5">⚠️</span>
+                <div>
+                  <p className="font-semibold">{modalError}</p>
+                  <p className="text-xs mt-1 opacity-90">
+                    Please fix the issue and try again.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {/* ALL YOUR EXISTING FORM FIELDS - NO CHANGES */}
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-3">Item Code *</label>
+              <input 
+                required 
+                value={formData.code} 
+                onChange={(e) => setFormData({...formData, code: e.target.value})}
+                className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-amber-400/50 focus:border-amber-400 text-s shadow-sm transition-all duration-300"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-3">Category *</label>
+              <select 
+                required 
+                value={formData.categoryName} 
+                onChange={(e) => setFormData({...formData, categoryName: e.target.value})}
+                className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-400/50 focus:border-emerald-400 text-s shadow-sm transition-all duration-300"
+              >
+                <option value="">Select Category</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.name}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-3">Item Name *</label>
+              <input 
+                required 
+                value={formData.name} 
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-amber-400/50 focus:border-amber-400 text-s shadow-sm transition-all duration-300"
+                placeholder="Gold Ring 18K" 
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-3">Karat *</label>
+              <select 
+                required 
+                value={formData.karatName} 
+                onChange={(e) => setFormData({...formData, karatName: e.target.value})}
+                disabled={karatsLoading}
+                className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-400/50 focus:border-emerald-400 text-s shadow-sm transition-all duration-300 disabled:opacity-50"
+              >
+                <option value="">Select Karat</option>
+                {karats.map((karat) => (
+                  <option key={karat.id} value={karat.name}>
+                    {karat.displayName}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-3">Weight (grams) *</label>
+              <input 
+                required 
+                type="number" step="0.01" min="0"
+                value={formData.weight} 
+                onChange={(e) => setFormData({...formData, weight: parseFloat(e.target.value) || 0})}
+                className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-400/50 focus:border-blue-400 text-s shadow-sm transition-all duration-300"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-3">Factory Price ($/gram) *</label>
+              <input 
+                required 
+                type="number" step="0.01" min="0"
+                value={formData.factoryPrice} 
+                onChange={(e) => setFormData({...formData, factoryPrice: parseFloat(e.target.value) || 0})}
+                className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-400/50 focus:border-blue-400 text-s shadow-sm transition-all duration-300"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-3">Stock Count *</label>
+              <input 
+                required 
+                type="number" min="0"
+                value={formData.inStockCount} 
+                onChange={(e) => setFormData({...formData, inStockCount: parseInt(e.target.value) || 0})}
+                className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-400/50 focus:border-emerald-400 text-s shadow-sm transition-all duration-300"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-3">Reserved Count</label>
+              <input 
+                type="number" min="0"
+                value={formData.reservedCount} 
+                onChange={(e) => setFormData({...formData, reservedCount: parseInt(e.target.value) || 0})}
+                className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-orange-400/50 focus:border-orange-400 text-s shadow-sm transition-all duration-300"
+              />
+            </div>
+
+            <div className="lg:col-span-2">
+              <label className="block text-sm font-bold text-gray-700 mb-3">Image URL *</label>
+              <input 
+                required 
+                value={formData.imageUrl} 
+                onChange={(e) => setFormData({...formData, imageUrl: e.target.value})}
+                className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-400/50 focus:border-purple-400 text-s shadow-sm transition-all duration-300"
+                placeholder="https://drive.google.com/..." 
+              />
+              <p className="text-xs text-gray-500 mt-2">Use Google Drive URLs</p>
+            </div>
+
+            <div className="lg:col-span-2">
+              <label className="block text-sm font-bold text-gray-700 mb-3">Description</label>
+              <textarea 
+                value={formData.description} 
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                rows={3}
+                className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-400/50 focus:border-purple-400 text-s shadow-sm transition-all duration-300 resize-vertical"
+                placeholder="Optional: Add item description..."
+              />
+            </div>
+
+            <div className="lg:col-span-2">
+              <label className="block text-sm font-bold text-gray-700 mb-3">Status</label>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input 
+                  type="checkbox" 
+                  checked={formData.isActive}
+                  onChange={(e) => setFormData({...formData, isActive: e.target.checked})}
+                  className="sr-only peer"
+                />
+                <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-600"></div>
+                <span className="ml-3 text-sm font-medium text-gray-900">
+                  {formData.isActive ? 'Active' : 'Inactive'}
+                </span>
+              </label>
+            </div>
+
+            <div className="lg:col-span-2 flex gap-10">
+              <button
+                type="submit"
+                disabled={submitLoading || karatsLoading || !formData.categoryName || !formData.karatName}
+                className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-700 hover:from-emerald-600 hover:to-emerald-800 text-white py-3 px-5 text-lg font-bold rounded-xl disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {submitLoading ? 'Saving...' : editingItem ? 'Update Item' : 'Create Item'}
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="flex-1 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-900 py-3 px-7 text-lg font-bold rounded-xl "
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ItemFormModal;

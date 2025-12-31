@@ -1,0 +1,88 @@
+// src/pages/AboutPage.tsx
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+
+export default function AboutPage() {
+  return (
+    <div className="min-h-screen flex flex-col bg-white">
+      <Navbar />
+
+      <main className="flex-1 pt-10">
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+          {/* Heading */}
+          <div className="text-center mb-10 sm:mb-12">
+            <h1 className="text-3xl sm:text-4xl font-semibold tracking-[0.15em] text-gray-900 uppercase">
+              Our Story
+            </h1>
+            <div className="mt-3 h-[2px] w-10 bg-gray-900 mx-auto" />
+          </div>
+
+          {/* Intro text */}
+          <div className="space-y-4 text-center text-sm sm:text-base text-gray-700 leading-relaxed max-w-3xl mx-auto">
+            <p>
+              Hawking is a premier online jewelry shop offering a stunning collection of gold jewelery. Our pieces are meticulously crafted with attention to detail,
+              featuring exquisite designs that exude elegance and style.
+            </p>
+            <p>
+              At Hawking, we take pride in our commitment to providing high‑quality jewelry, each piece
+              showcasing exceptional craftsmanship and timeless beauty. Our team is dedicated to offering
+              a seamless shopping experience, ensuring that every customer finds the perfect piece to
+              cherish for a lifetime.
+            </p>
+          </div>
+
+          {/* Images row */}
+          <div className="mt-8 flex justify-center">
+            <div className="grid grid-cols-2 gap-6 sm:gap-16 justify-items-center">
+                <div className="w-44 h-44 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-xl overflow-hidden shadow-sm">
+                <img
+                    src="/about-ring.jpg"
+                    alt="Gold rings on hand"
+                    className="w-full h-full object-cover"
+                />
+                </div>
+                <div className="w-44 h-44 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-xl overflow-hidden shadow-sm">
+                <img
+                    src="/about-necklace.jpg"
+                    alt="Gold necklace in hand"
+                    className="w-full h-full object-cover"
+                />
+                </div>
+            </div>
+          </div>
+
+          {/* Values / small section */}
+          <div className="mt-12 grid gap-8 sm:grid-cols-3 text-center text-sm sm:text-base">
+            <div className="space-y-2">
+              <h3 className="font-semibold text-gray-900 tracking-wide uppercase text-xs sm:text-sm">
+                Craftsmanship
+              </h3>
+              <p className="text-gray-600">
+                Each piece is thoughtfully designed and carefully finished to highlight the natural
+                beauty of gold.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <h3 className="font-semibold text-gray-900 tracking-wide uppercase text-xs sm:text-sm">
+                Quality
+              </h3>
+              <p className="text-gray-600">
+                We source premium materials to ensure durability, comfort, and a lasting shine.
+              </p>
+            </div>
+            <div className="space-y-2">
+              <h3 className="font-semibold text-gray-900 tracking-wide uppercase text-xs sm:text-sm">
+                Experience
+              </h3>
+              <p className="text-gray-600">
+                From browsing to checkout, we focus on making your jewelry journey smooth and enjoyable.
+              </p>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
