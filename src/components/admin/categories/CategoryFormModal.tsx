@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import type { AdminCategory } from '../../../services/api';
-import { adminCreateCategory, adminUpdateCategory } from '../../../services/api';
+import type { AdminCategory } from '../../../services/adminApi';
+import { adminCreateCategory, adminUpdateCategory } from '../../../services/adminApi';
 import { useToast } from '../../../contexts/ToastContext';
 
 interface CategoryFormData {
@@ -27,8 +27,8 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
     name: '',
     description: ''
   });
-  const [submitLoading, setSubmitLoading] = useState(false);
-  const [modalError, setModalError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const { addToast } = useToast();
 
@@ -41,115 +41,141 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
     } else {
       setFormData({ name: '', description: '' });
     }
-    setModalError('');
+    setError('');
   }, [editingCategory, showForm]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitLoading(true);
-    setModalError('');
+
+    if (!formData.name.trim() || !formData.description.trim()) {
+      setError('Please fill all required fields');
+      return;
+    }
 
     try {
-      if (!formData.name.trim()) throw new Error('Category name is required');
-      if (!formData.description.trim()) throw new Error('Description is required');
+      setLoading(true);
+      setError('');
 
-      const submitData = {
+      const payload = {
         name: formData.name.trim(),
         description: formData.description.trim()
       };
 
       if (editingCategory) {
-        await adminUpdateCategory(editingCategory.id, submitData);
-        addToast(`"${formData.name}" updated successfully.`, 'success');
+        await adminUpdateCategory(editingCategory.id, payload);
+        addToast(`"${payload.name}" updated successfully`, 'success');
       } else {
-        await adminCreateCategory(submitData);
-        addToast(`"${formData.name}" created successfully.`, 'success');
+        await adminCreateCategory(payload);
+        addToast(`"${payload.name}" created successfully`, 'success');
       }
 
       onClose();
       await onSubmitSuccess(page);
     } catch (err: any) {
-      console.error('Category save error:', err);
-      const errorMsg = err.response?.data?.status?.description || 
-                      err.response?.data?.message || 
-                      err.response?.data?.error || 
-                      err.message || 
-                      'Failed to save category';
-      setModalError(errorMsg);
+      const errorMsg =
+        err.response?.data?.status?.description ||
+        err.response?.data?.message ||
+        err.message ||
+        'Something went wrong';
+      setError(errorMsg);
     } finally {
-      setSubmitLoading(false);
+      setLoading(false);
     }
   };
 
   if (!showForm) return null;
 
   return (
-    <div className="fixed inset-0 bg-gray-500/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
-      <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto border border-gray-200">
-        <div className="p-8">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-black bg-blue-700 bg-clip-text text-transparent">
-              {editingCategory ? `Edit ${editingCategory.name}` : 'New Category'}
-            </h2>
-            <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-xl transition-colors">
-              <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
+    <>
+      {/* Overlay */}
+      <div className="fixed inset-0 bg-black/10 backdrop-blur-sm z-50 animate-in fade-in duration-200" />
 
-          {modalError && (
-            <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 rounded-2xl text-red-900 text-sm shadow-lg">
-              <div className="flex items-start gap-3">
-                <span className="text-lg font-bold mt-0.5">⚠️</span>
-                <p className="font-semibold">{modalError}</p>
-              </div>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-3">Category Name * (e.g. "Rings")</label>
-              <input
-                required
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-400/50 focus:border-blue-400 shadow-sm transition-all duration-300"
-                placeholder="Rings"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-3">Description * (e.g. "Rings Collection")</label>
-              <input
-                required
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                className="w-full px-5 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-400/50 focus:border-emerald-400 shadow-sm transition-all duration-300"
-                placeholder="Rings Collection"
-              />
-            </div>
-
-            <div className="flex gap-10">
+      {/* Modal */}
+      <div className="fixed inset-0 flex items-center justify-center z-50 p-4 animate-in fade-in zoom-in duration-200">
+        <div className="bg-white/95 rounded-xl shadow-2xl max-w-md w-full border border-gray-200 animate-in slide-in-from-bottom-4 duration-300">
+          <div className="p-6 pb-4">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">
+                {editingCategory ? 'Edit Category' : 'New Category'}
+              </h2>
               <button
-                type="submit"
-                disabled={submitLoading || !formData.name || !formData.description}
-                className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-700 hover:from-emerald-600 hover:to-emerald-800 text-white py-3 px-7 text-lg font-bold rounded-xl disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {submitLoading ? 'Saving...' : editingCategory ? 'Update Category' : 'Create Category'}
-              </button>
-              <button
-                type="button"
                 onClick={onClose}
-                className="flex-1 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-900 py-3 px-7 text-lg font-bold rounded-xl"
+                className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
               >
-                Cancel
+                <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
-          </form>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Category Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  disabled={loading}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Description <span className="text-red-500">*</span>
+                </label>
+                <input
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  disabled={loading}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                  required
+                />
+              </div>
+
+              {error && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-xl">
+                  <p className="text-sm font-semibold text-red-800">{error}</p>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-2 px-4 rounded-xl text-lg font-bold shadow-xl hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {loading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      Saving...
+                    </>
+                  ) : editingCategory ? (
+                    'Update Category'
+                  ) : (
+                    'Create Category'
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={onClose}
+                  disabled={loading}
+                  className="flex-1 py-2 px-4 rounded-xl text-lg font-bold border border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

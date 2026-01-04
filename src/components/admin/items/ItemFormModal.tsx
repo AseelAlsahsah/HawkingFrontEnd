@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import type { AdminCategory, AdminItem, AdminKarat } from '../../../services/api';
-import { adminCreateItem, adminUpdateItem, adminFetchKarats } from '../../../services/api';
+import type { AdminCategory, AdminKarat } from '../../../services/api';
+import type { AdminItem } from '../../../services/adminApi';
+import { adminFetchKarats } from '../../../services/api';
+import { adminCreateItem, adminUpdateItem } from '../../../services/adminApi';
 import { useToast } from '../../../contexts/ToastContext'; 
 
 interface ItemFormData {
   code: string;
   name: string;
   description: string;
-  weight: number;
+  weight: number | '';
   categoryName: string;
   karatName: string;
-  factoryPrice: number;
+  factoryPrice: number | '';
   imageUrl: string;
-  inStockCount: number;
-  reservedCount: number;
+  inStockCount: number | '';
+  reservedCount: number | '';
   isActive: boolean;
 }
 
@@ -44,23 +46,20 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
     code: '',
     name: '',
     description: '',
-    weight: 0,
+    weight: '',
     categoryName: '',
     karatName: '',
-    factoryPrice: 0,
+    factoryPrice: '',
     imageUrl: '',
-    inStockCount: 0,
-    reservedCount: 0,
+    inStockCount: '',
+    reservedCount: '',
     isActive: true,
   });
   const [karats, setKarats] = useState<AdminKarat[]>([]);
   const [karatsLoading, setKaratsLoading] = useState(true);
   const [submitLoading, setSubmitLoading] = useState(false);
-
-  // ✅ TOAST HOOK
   const { addToast } = useToast();
 
-  // ✅ FETCH KARATS
   useEffect(() => {
     const fetchKarats = async () => {
       try {
@@ -94,9 +93,9 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
       });
     } else {
       setFormData({
-        code: '', name: '', description: '', weight: 0, categoryName: '',
-        karatName: '', factoryPrice: 0, imageUrl: '', inStockCount: 0, 
-        reservedCount: 0, isActive: true
+        code: '', name: '', description: '', weight: '', categoryName: '',
+        karatName: '', factoryPrice: '', imageUrl: '', inStockCount: '', 
+        reservedCount: '', isActive: true
       });
     }
   }, [editingItem]);
@@ -104,9 +103,7 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitLoading(true);
-    setModalError(''); // ✅ Clear modal error
-
-    console.log('🚀 SUBMIT CLICKED:', { editingItemId: editingItem?.id, formData });
+    setModalError(''); 
 
     try {
       // VALIDATION CHECKS
@@ -115,6 +112,9 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
       if (!formData.categoryName) throw new Error('Please select a category');
       if (!formData.karatName) throw new Error('Please select a karat');
       if (!formData.imageUrl.trim()) throw new Error('Image URL is required');
+      if (formData.weight === '') throw new Error('Weight is required');
+      if (formData.factoryPrice === '') throw new Error('Factory price is required');
+      if (formData.inStockCount === '') throw new Error('Stock count is required');
 
       if (editingItem && (!editingItem.id || editingItem.id <= 0)) {
         throw new Error('Invalid item ID. Please try again.');
@@ -122,10 +122,10 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
 
       const submitData = {
         ...formData,
-        weight: parseFloat(formData.weight.toString()) || 0,
-        factoryPrice: parseFloat(formData.factoryPrice.toString()) || 0,
-        inStockCount: parseInt(formData.inStockCount.toString()) || 0,
-        reservedCount: parseInt(formData.reservedCount.toString()) || 0,
+        weight: Number(formData.weight),
+        factoryPrice: Number(formData.factoryPrice),
+        inStockCount: Number(formData.inStockCount),
+        reservedCount: Number(formData.reservedCount || 0),
       };
 
       if (editingItem) {
@@ -135,24 +135,15 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
         await adminCreateItem(submitData);
         addToast(`"${formData.name}" created successfully.`, 'success');
       }
-
-      console.log('SUCCESS!');
       onClose();
       await onSubmitSuccess(page, categoryFilter);
     } catch (err: any) {
       console.error('ERROR:', err);
-      
-      let errorMsg = 'Operation failed';      
-      if (err.response?.data?.status?.description) {
-        errorMsg = err.response.data.status.description; 
-      } else if (err.response?.data?.detail) {
-        errorMsg = err.response.data.detail;
-      } else if (err.response?.data?.message) {
-        errorMsg = err.response.data.message;
-      } else if (err.message) {
-        errorMsg = err.message;
-      }
-      
+      const errorMsg =
+        err.response?.data?.status?.description ||
+        err.response?.data?.message ||
+        err.message ||
+        'Failed to save item';
       setModalError(errorMsg); 
     } finally {
       setSubmitLoading(false);
@@ -161,93 +152,91 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
 
   if (!showForm) return null;
 
-  return (
-    <div className="fixed inset-0 bg-gray-500/80 backdrop-blur-md flex items-center justify-center z-50 p-4">
-      <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl max-w-4xl w-full mx-4 max-h-[95vh] overflow-y-auto border border-gray-200">
-        <div className="p-8">
+return (
+  <>
+    {/* Overlay – SAME as GoldPrice */}
+    <div className="fixed inset-0 bg-black/10 backdrop-blur-sm z-50 animate-in fade-in duration-200" />
+
+    {/* Modal */}
+    <div className="fixed inset-0 flex items-center justify-center z-50 p-4 animate-in fade-in zoom-in duration-200">
+      <div className="bg-white/95 rounded-xl shadow-2xl max-w-4xl w-full border border-gray-200 animate-in slide-in-from-bottom-4 duration-300 max-h-[95vh] overflow-y-auto">
+        <div className="p-6 pb-4">
+
+          {/* Header – SAME hierarchy as GoldPrice */}
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-black bg-gray-900 bg-clip-text text-transparent">
-              {editingItem ? `Edit ${editingItem.name}` : 'Create New Item'}
+            <h2 className="text-2xl font-bold text-gray-900">
+              {editingItem ? `Edit ${editingItem.name}` : 'New Item'}
             </h2>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-200 rounded-xl transition-colors"
+              className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
             >
-              <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
 
-          {/* ✅ BEAUTIFUL MODAL ERROR DISPLAY */}
+          {/* Error – SAME as GoldPrice */}
           {modalError && (
-            <div className="mb-6 p-4 bg-red-50 border-l-4 border-red-400 bg-gradient-to-r from-red-50/90 to-red-100/50 backdrop-blur-sm rounded-2xl text-red-900 text-sm shadow-lg">
-              <div className="flex items-start gap-3">
-                <span className="text-lg font-bold mt-0.5">⚠️</span>
-                <div>
-                  <p className="font-semibold">{modalError}</p>
-                  <p className="text-xs mt-1 opacity-90">
-                    Please fix the issue and try again.
-                  </p>
-                </div>
-              </div>
+            <div className="p-3 mb-5 bg-red-50 border border-red-200 rounded-xl">
+              <p className="text-sm font-semibold text-red-800">
+                {modalError}
+              </p>
             </div>
           )}
 
+          {/* Form – GRID KEPT */}
           <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {/* ALL YOUR EXISTING FORM FIELDS - NO CHANGES */}
+
+            {/* Inputs – SAME INPUT STYLE AS GoldPrice */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-3">Item Code *</label>
-              <input 
-                required 
-                value={formData.code} 
-                onChange={(e) => setFormData({...formData, code: e.target.value})}
-                className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-amber-400/50 focus:border-amber-400 text-s shadow-sm transition-all duration-300"
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Item Code *</label>
+              <input
+                value={formData.code}
+                onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md"
+                required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-3">Category *</label>
-              <select 
-                required 
-                value={formData.categoryName} 
-                onChange={(e) => setFormData({...formData, categoryName: e.target.value})}
-                className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-400/50 focus:border-emerald-400 text-s shadow-sm transition-all duration-300"
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Category *</label>
+              <select
+                value={formData.categoryName}
+                onChange={(e) => setFormData({ ...formData, categoryName: e.target.value })}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md"
+                required
               >
                 <option value="">Select Category</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.name}>
-                    {category.name}
-                  </option>
+                {categories.map(c => (
+                  <option key={c.id} value={c.name}>{c.name}</option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-3">Item Name *</label>
-              <input 
-                required 
-                value={formData.name} 
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
-                className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-amber-400/50 focus:border-amber-400 text-s shadow-sm transition-all duration-300"
-                placeholder="Gold Ring 18K" 
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Item Name *</label>
+              <input
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md"
+                required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-3">Karat *</label>
-              <select 
-                required 
-                value={formData.karatName} 
-                onChange={(e) => setFormData({...formData, karatName: e.target.value})}
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Karat *</label>
+              <select
+                value={formData.karatName}
+                onChange={(e) => setFormData({ ...formData, karatName: e.target.value })}
                 disabled={karatsLoading}
-                className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-400/50 focus:border-emerald-400 text-s shadow-sm transition-all duration-300 disabled:opacity-50"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md disabled:opacity-50"
+                required
               >
                 <option value="">Select Karat</option>
-                {karats.map((karat) => (
-                  <option key={karat.id} value={karat.name}>
-                    {karat.displayName}
-                  </option>
+                {karats.map(k => (
+                  <option key={k.id} value={k.name}>{k.displayName}</option>
                 ))}
               </select>
             </div>
@@ -256,9 +245,9 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
               <label className="block text-sm font-bold text-gray-700 mb-3">Weight (grams) *</label>
               <input 
                 required 
-                type="number" step="0.01" min="0"
+                type="number" step="0.01"
                 value={formData.weight} 
-                onChange={(e) => setFormData({...formData, weight: parseFloat(e.target.value) || 0})}
+                onChange={(e) => setFormData({...formData, weight: e.target.value === '' ? '' : Number(e.target.value),})}
                 className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-400/50 focus:border-blue-400 text-s shadow-sm transition-all duration-300"
               />
             </div>
@@ -267,9 +256,9 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
               <label className="block text-sm font-bold text-gray-700 mb-3">Factory Price ($/gram) *</label>
               <input 
                 required 
-                type="number" step="0.01" min="0"
+                type="number" step="0.01" 
                 value={formData.factoryPrice} 
-                onChange={(e) => setFormData({...formData, factoryPrice: parseFloat(e.target.value) || 0})}
+                onChange={(e) => setFormData({...formData, factoryPrice: e.target.value === '' ? '' : Number(e.target.value),})}
                 className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-400/50 focus:border-blue-400 text-s shadow-sm transition-all duration-300"
               />
             </div>
@@ -278,9 +267,9 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
               <label className="block text-sm font-bold text-gray-700 mb-3">Stock Count *</label>
               <input 
                 required 
-                type="number" min="0"
+                type="number" 
                 value={formData.inStockCount} 
-                onChange={(e) => setFormData({...formData, inStockCount: parseInt(e.target.value) || 0})}
+                onChange={(e) => setFormData({...formData, inStockCount: e.target.value === '' ? '' : Number(e.target.value),})}
                 className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-400/50 focus:border-emerald-400 text-s shadow-sm transition-all duration-300"
               />
             </div>
@@ -288,9 +277,9 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-3">Reserved Count</label>
               <input 
-                type="number" min="0"
+                type="number" 
                 value={formData.reservedCount} 
-                onChange={(e) => setFormData({...formData, reservedCount: parseInt(e.target.value) || 0})}
+                onChange={(e) => setFormData({...formData, reservedCount: e.target.value === '' ? '' : Number(e.target.value),})}
                 className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-orange-400/50 focus:border-orange-400 text-s shadow-sm transition-all duration-300"
               />
             </div>
@@ -334,26 +323,30 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
               </label>
             </div>
 
-            <div className="lg:col-span-2 flex gap-10">
-              <button
-                type="submit"
-                disabled={submitLoading || karatsLoading || !formData.categoryName || !formData.karatName}
-                className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-700 hover:from-emerald-600 hover:to-emerald-800 text-white py-3 px-5 text-lg font-bold rounded-xl disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {submitLoading ? 'Saving...' : editingItem ? 'Update Item' : 'Create Item'}
-              </button>
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex-1 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-900 py-3 px-7 text-lg font-bold rounded-xl "
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
+            {/* Actions – SAME as GoldPrice */}
+              <div className="lg:col-span-2 flex gap-3 pt-2">
+                <button
+                  type="submit"
+                  disabled={submitLoading}
+                  className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-2 px-4 rounded-xl text-lg font-bold shadow-xl hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {submitLoading ? 'Saving…' : editingItem ? 'Update Item' : 'Create Item'}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="flex-1 py-2 px-4 rounded-xl text-lg font-bold border border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow-md"
+                >
+                  Cancel
+                </button>
+              </div>
+
+            </form>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

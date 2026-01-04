@@ -1,15 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAdminAuth } from '../../../contexts/AdminAuthContext';
-import { 
-  adminFetchItems,
-  adminFetchCategories,
-  adminGetItemByCode 
-} from '../../../services/api';
-import type { 
-  AdminItem,
-  Item,
-  AdminCategory
-} from '../../../services/api';
+import { adminFetchCategories } from '../../../services/api';
+import { adminFetchItems, adminGetItemByCode } from '../../../services/adminApi';
+import type { Item, AdminCategory } from '../../../services/api';
+import type { AdminItem} from '../../../services/adminApi';
 import AdminSearchBar from '../AdminSearchBar';
 import AdminCodeSearchBar from '../AdminCodeSearchBar'; 
 import ItemActions from './ItemActions';
@@ -17,7 +10,6 @@ import ItemFormModal from './ItemFormModal';
 import { useNavigate } from 'react-router-dom';  
 
 const ItemsManagement: React.FC = () => {
-  const { token } = useAdminAuth();
   const navigate = useNavigate();  
   
   const [categories, setCategories] = useState<AdminCategory[]>([]);
@@ -49,6 +41,15 @@ const ItemsManagement: React.FC = () => {
     }
   }, []);
 
+  const getErrorMessage = (err: any, fallback = 'Something went wrong') => {
+    return (
+      err?.response?.data?.message ||
+      err.response?.data?.status?.description ||
+      err?.message ||
+      fallback
+    );
+  };
+
   const fetchItems = useCallback(async (pageNum: number = 0, category?: string) => {
     setLoading(true);
     setError('');
@@ -65,7 +66,7 @@ const ItemsManagement: React.FC = () => {
       setTotalPages(data.page?.totalPages || 0);
     } catch (err: any) {
       console.error('Fetch items error:', err);
-      setError(err.message || 'Failed to load items');
+      setError(getErrorMessage(err, 'Failed to load items'));
       setItems([]);
     } finally {
       setLoading(false);
@@ -79,7 +80,7 @@ const ItemsManagement: React.FC = () => {
       console.log('Found full item:', fullItem.id, fullItem.code);
       return fullItem;
     } catch (err: any) {
-      console.error('❌ Failed to fetch item by code:', code, err);
+      console.error('Failed to fetch item by code:', code, err);
       throw new Error(`Item "${code}" not found in database`);
     }
   }, []);
@@ -175,7 +176,7 @@ const ItemsManagement: React.FC = () => {
       try {
         fullItem = await fetchItemByCode(item.code!);
       } catch (err: any) {
-        setError(err.message);
+        setError(getErrorMessage(err, 'Failed to load items'));
         return;
       }
     }
@@ -218,14 +219,14 @@ const ItemsManagement: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-amber-50">
+    <div className="min-h-screen bg-gray-100">
       {/* Header */}
       <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div className="flex items-center gap-4">
               <div>
-                <h1 className="text-3xl font-bold bg-gray-900 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold text-gray-900">
                   Items Management
                 </h1>
                 <p className="mt-1 text-lg text-gray-600 font-medium">
@@ -389,7 +390,7 @@ const ItemsManagement: React.FC = () => {
           <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-8">
             <div className="overflow-x-auto">
               <table className="w-full divide-y divide-gray-200">
-                <thead className="bg-gradient-to-r from-gray-50 to-amber-50/50">
+                <thead className="bg-gray-50">
                   <tr>
                     <th className="px-10 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Code</th>
                     <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Item</th>

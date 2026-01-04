@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAdminAuth } from '../../../contexts/AdminAuthContext';
 import { 
   adminFetchCategories
 } from '../../../services/api';
@@ -9,7 +8,6 @@ import CategoryActions from './CategoryActions';
 import { useNavigate } from 'react-router-dom';
 
 const CategoriesManagement: React.FC = () => {
-  const { token } = useAdminAuth();
   const navigate = useNavigate();
 
   // Core States
@@ -68,7 +66,7 @@ const CategoriesManagement: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-8">
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-8">
         <div className="text-center">
           <div className="w-16 h-16 mx-auto bg-gradient-to-br from-gray-200 to-gray-300 rounded-2xl flex items-center justify-center mb-6 shadow-lg animate-pulse">
             <div className="w-8 h-8 bg-white rounded-xl"></div>
@@ -81,17 +79,17 @@ const CategoriesManagement: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    <div className="min-h-screen bg-gray-100">
       {/* Header */}
       <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div className="flex items-center gap-4">
               <div>
-                <h1 className="text-3xl font-bold bg-blue-700 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold text-gray-900">
                   Category Management
                 </h1>
-                <p className="mt-1 text-lg text-gray-600 font-medium">
+                <p className="mt-1 text-sm text-gray-600 font-medium">
                   Manage product categories.
                 </p>
               </div>
@@ -147,7 +145,7 @@ const CategoriesManagement: React.FC = () => {
           <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-8">
             <div className="overflow-x-auto">
               <table className="w-full divide-y divide-gray-200">
-                <thead className="bg-gradient-to-r from-gray-50 to-blue-50/50">
+                <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Name</th>
                     <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Description</th>
@@ -158,7 +156,7 @@ const CategoriesManagement: React.FC = () => {
                   {categories.map((category) => (
                     <tr key={category.id} className="hover:bg-gray-50/80 transition-all duration-200">
                       <td className="px-6 py-6 text-center">
-                        <span className="inline-flex px-3 py-1 bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 text-sm font-bold rounded-xl shadow-sm">
+                        <span className="px-3 py-1 font-semibold text-gray-900">
                           {category.name}
                         </span>
                       </td>

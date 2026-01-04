@@ -1,7 +1,7 @@
 // src/components/admin/items/ItemActions.tsx
 import React from 'react';
-import type { AdminItem } from '../../../services/api';
-import { adminDeleteItem } from '../../../services/api';
+import type { AdminItem } from '../../../services/adminApi';
+import { adminDeleteItem } from '../../../services/adminApi';
 
 interface ItemActionsProps {
   item: AdminItem;

@@ -1,6 +1,6 @@
 import React from 'react';
-import type { AdminCategory } from '../../../services/api';
-import { adminDeleteCategory } from '../../../services/api';
+import type { AdminCategory } from '../../../services/adminApi';
+import { adminDeleteCategory } from '../../../services/adminApi';
 import { useToast } from '../../../contexts/ToastContext';
 
 interface CategoryActionsProps {
@@ -54,14 +54,14 @@ const CategoryActions: React.FC<CategoryActionsProps> = ({
         <div className="relative group/edit">
           <button
             onClick={() => onEdit(category)}
-            className="p-2.5 text-blue-600 hover:text-blue-700 hover:bg-blue-50/80 active:bg-blue-100 rounded-xl transition-all duration-200 hover:shadow-md hover:shadow-blue-200/50 hover:scale-105 active:scale-100 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+            className="p-2.5 text-amber-600 hover:text-amber-700 hover:bg-amber-50/80 active:bg-amber-100 rounded-xl transition-all duration-200 hover:shadow-md hover:shadow-amber-200/50 hover:scale-105 active:scale-100 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-offset-2"
             aria-label="Edit category"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
           </button>
-          <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 opacity-0 invisible group-hover/edit:opacity-100 group-hover/edit:visible group-hover/edit:scale-100 transition-all duration-200 ease-out bg-blue-900/95 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-xl border border-blue-800/50 whitespace-nowrap z-20 after:absolute after:-bottom-1 after:left-1/2 after:transform after:-translate-x-1/2 after:w-0 after:h-0 after:border-l-[6px] after:border-l-transparent after:border-r-[6px] after:border-r-transparent after:border-t-[6px] after:border-t-blue-900/95">
+          <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 opacity-0 invisible group-hover/edit:opacity-100 group-hover/edit:visible group-hover/edit:scale-100 transition-all duration-200 ease-out bg-amber-900/95 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-xl border border-amber-800/50 whitespace-nowrap z-20 after:absolute after:-bottom-1 after:left-1/2 after:transform after:-translate-x-1/2 after:w-0 after:h-0 after:border-l-[6px] after:border-l-transparent after:border-r-[6px] after:border-r-transparent after:border-t-[6px] after:border-t-blue-900/95">
             Edit Category
           </div>
         </div>

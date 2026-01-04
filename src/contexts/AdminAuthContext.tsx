@@ -86,7 +86,6 @@ export const AdminAuthProvider: React.FC<AdminAuthProviderProps> = ({ children }
     }
   };
 
-  // ✅ FIXED LOGOUT - Calls Backend + Clears Everything
   const logout = async (): Promise<void> => {
     try {
       // 1. Call backend logout API

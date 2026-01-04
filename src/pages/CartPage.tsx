@@ -9,7 +9,7 @@ export default function CartPage() {
 
   if (cart.length === 0) {
     return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-br from-gold-50 to-amber-50">
+      <div className="min-h-screen flex flex-col bg-gray-100">
         <Navbar />
         <main className="flex-1 pt-16 flex items-center justify-center">
           <div className="text-center p-12 max-w-md">
@@ -17,7 +17,7 @@ export default function CartPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Your cart is empty</h2>
             <Link 
               to="/collections" 
-              className="inline-flex items-center px-8 py-4 bg-gold-600 text-white font-semibold rounded-xl hover:bg-gold-700 transition text-lg"
+              className="inline-flex items-center px-8 py-3 bg-gold-600 text-white font-semibold rounded-xl hover:bg-gold-700 transition text-lg"
             >
               Start Shopping
             </Link>
@@ -29,7 +29,7 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gold-50 to-amber-50">
+    <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
       <main className="flex-1 pt-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

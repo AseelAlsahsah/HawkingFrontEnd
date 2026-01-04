@@ -55,7 +55,7 @@ export default function ItemDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-br from-gold-50 to-amber-50">
+      <div className="min-h-screen flex flex-col bg-gray-50">
         <Navbar />
         <main className="flex-1 pt-16 flex items-center justify-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gold-600"></div>
@@ -217,7 +217,7 @@ export default function ItemDetail() {
                 <div className="space-y-1 text-sm">
                   <div className="flex items-center">
                     <span className="font-medium text-gray-800 w-10">Code:</span>
-                    <span className="font-mono bg-gold-100 px-3 py-1 rounded-full text-xs font-semibold ml-3">
+                    <span className="font-mono px-3 py-1 text-xs font-semibold ml-3">
                       {item.code}
                     </span>
                   </div>

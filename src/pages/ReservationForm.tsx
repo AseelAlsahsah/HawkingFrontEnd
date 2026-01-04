@@ -79,7 +79,7 @@ export default function ReservationForm() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gold-50 to-amber-50">
+    <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
       <main className="flex-1 pt-16">
         <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-12">

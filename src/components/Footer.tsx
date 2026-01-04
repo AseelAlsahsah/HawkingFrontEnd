@@ -41,7 +41,6 @@ export default function Footer() {
           </a>
         </div>
 
-        {/* Right: rights text */}
         <p className="text-center md:text-right">
           © {new Date().getFullYear()} Hawking. All rights reserved.
         </p>

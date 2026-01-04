@@ -1,18 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useAdminAuth } from '../../../contexts/AdminAuthContext';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { 
   adminFetchGoldPrices,
   type AdminGoldPrice
-} from '../../../services/api';
+} from '../../../services/adminApi';
 import GoldPriceFormModal from './GoldPriceFormModal';
 import GoldPriceActions from './GoldPriceActions';
 
 const GoldPricesManagement: React.FC = () => {
-  const { user } = useAdminAuth();
   const navigate = useNavigate();
 
-  // Core States - EXACTLY like Categories
   const [goldPrices, setGoldPrices] = useState<AdminGoldPrice[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -21,7 +18,6 @@ const GoldPricesManagement: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingGoldPrice, setEditingGoldPrice] = useState<AdminGoldPrice | null>(null);
 
-  // ✅ EXACT CATEGORIES PATTERN - EMPTY DEPENDENCIES
   const fetchGoldPrices = useCallback(async (pageNum: number = 0) => {
     setLoading(true);
     setError('');
@@ -41,7 +37,7 @@ const GoldPricesManagement: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, []); // ✅ EMPTY = STABLE FOREVER
+  }, []);
 
   const handleNewGoldPrice = () => {
     setEditingGoldPrice(null);
@@ -69,7 +65,7 @@ const GoldPricesManagement: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-amber-50 flex items-center justify-center p-8">
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-8">
         <div className="text-center">
           <div className="w-16 h-16 mx-auto bg-gradient-to-br from-gray-200 to-gray-300 rounded-2xl flex items-center justify-center mb-6 shadow-lg animate-pulse">
             <div className="w-8 h-8 bg-white rounded-xl"></div>
@@ -82,16 +78,16 @@ const GoldPricesManagement: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-amber-50">
+    <div className="min-h-screen bg-gray-100">
       <header className="bg-white/90 backdrop-blur-sm border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div className="flex items-center gap-4">
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-emerald-700 bg-clip-text text-transparent">
+                <h1 className="text-3xl font-bold text-gray-900">
                   Gold Price Management
                 </h1>
-                <p className="mt-1 text-lg text-gray-600 font-medium">
+                <p className="mt-1 text-sm text-gray-600 font-medium">
                   Manage daily gold prices per karat
                 </p>
               </div>
@@ -144,7 +140,7 @@ const GoldPricesManagement: React.FC = () => {
           <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-8">
             <div className="overflow-x-auto">
               <table className="w-full divide-y divide-gray-200">
-                <thead className="bg-gradient-to-r from-gray-50 to-emerald-50/50">
+                <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Karat</th>
                     <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Price/Gram</th>
@@ -157,7 +153,7 @@ const GoldPricesManagement: React.FC = () => {
                   {goldPrices.map((goldPrice) => (
                     <tr key={goldPrice.id} className="hover:bg-gray-50/80 transition-all duration-200">
                       <td className="px-6 py-6 text-center">
-                        <span className="inline-flex px-3 py-1 bg-gradient-to-r from-amber-100 to-yellow-200 text-amber-800 text-sm font-bold rounded-xl shadow-sm">
+                        <span className="inline-flex px-5 py-1 bg-gradient-to-r from-amber-100 to-yellow-200 text-amber-800 text-sm font-bold rounded-xl shadow-sm">
                           {goldPrice.karat.displayName}
                         </span>
                       </td>

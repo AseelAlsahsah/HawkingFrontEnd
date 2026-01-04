@@ -53,14 +53,14 @@ export default function SearchPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gold-50 to-amber-50">
+    <div className="min-h-screen flex flex-col bg-gray-100">
       <Navbar />
       <main className="flex-1 pt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">Search Results</h1>
-            <p className="text-xl text-gray-600">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">Search Results</h1>
+            <p className="text-lg text-gray-600">
               Showing {results.page.totalElements} results for <span className="font-semibold text-gold-600">"{query}"</span>
             </p>
           </div>
@@ -73,11 +73,11 @@ export default function SearchPage() {
               ))}
             </div>
           ) : results.content.length === 0 ? (
-            <div className="text-center py-24">
-              <div className="text-6xl mb-6">🔍</div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">No results found</h2>
-              <p className="text-lg text-gray-600 mb-8">Try different keywords like "ring", "necklace", or "18K"</p>
-              <a href="/collections" className="inline-flex px-8 py-4 bg-gold-600 text-white font-semibold rounded-xl hover:bg-gold-700">
+            <div className="text-center py-20">
+              {/* <div className="text-4xl mb-6">🔍</div> */}
+              <h2 className="text-xl font-semibold text-gray-900 mb-4">No results found</h2>
+              <br/>
+              <a href="/collections" className="inline-flex px-8 py-3 bg-gold-600 text-white font-semibold rounded-xl hover:bg-gold-700">
                 Browse Collections
               </a>
             </div>

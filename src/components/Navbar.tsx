@@ -3,14 +3,13 @@ import { ShoppingBag, Search, Menu, X } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useCart } from '../contexts/CartContext';
 import type { Item } from "../services/api";
-import { searchItems } from "../services/api";  // Add this function to api.ts first
+import { searchItems } from "../services/api";  
 
 const navLinks = [
   { label: "Home", path: "/" },
   { label: "Collections", path: "/collections" },
   { label: "About", path: "/about" },
   { label: "Get in Touch", path: "/contact" },
-  // { label: "Cart", path: "/cart" }
 ];
 
 export default function Navbar() {
@@ -24,7 +23,6 @@ export default function Navbar() {
   const { cartCount } = useCart();
   const searchRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -35,7 +33,6 @@ export default function Navbar() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Search on query change (debounced)
   useEffect(() => {
     if (searchQuery.length < 2) {
       setSearchResults([]);
@@ -67,7 +64,6 @@ export default function Navbar() {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      // ✅ Go to dedicated search page
       navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
       setShowSearchDropdown(false);
       setSearchQuery('');

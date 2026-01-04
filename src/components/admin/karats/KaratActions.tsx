@@ -1,6 +1,6 @@
 import React from 'react';
 import type { AdminKarat } from '../../../services/api';
-import { adminDeleteKarat } from '../../../services/api';
+import { adminDeleteKarat } from '../../../services/adminApi';
 import { useToast } from '../../../contexts/ToastContext';
 
 interface KaratActionsProps {
@@ -26,6 +26,15 @@ const KaratActions: React.FC<KaratActionsProps> = ({
     setShowDeleteModal(true); 
   };
 
+  const getErrorMessage = (err: any, fallback = 'Something went wrong') => {
+    return (
+      err?.response?.data?.message ||
+      err.response?.data?.status?.description ||
+      err?.message ||
+      fallback
+    );
+  };
+
   const confirmDelete = async () => {
     setShowDeleteModal(false);
     
@@ -36,7 +45,7 @@ const KaratActions: React.FC<KaratActionsProps> = ({
       await fetchKarats(page);
     } catch (err: any) {
       console.error('Delete error:', err);
-      setError(err.response?.data?.status?.description || err.message || 'Failed to delete karat');
+      setError(getErrorMessage(err, 'Failed to load items'));
       addToast('Failed to delete karat', 'error');
     } finally {
       setDeleting(false);

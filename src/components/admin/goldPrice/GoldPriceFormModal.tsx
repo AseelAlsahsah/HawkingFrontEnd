@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { adminFetchKarats, adminCreateGoldPrice, adminUpdateGoldPrice, type AdminGoldPrice, type AdminKarat } from '../../../services/api';
+import { adminFetchKarats } from '../../../services/api';
+import { adminCreateGoldPrice, adminUpdateGoldPrice, type AdminGoldPrice, type AdminKarat } from '../../../services/adminApi';
 
 interface GoldPriceFormModalProps {
   showForm: boolean;

@@ -22,6 +22,8 @@ import KaratsManagement from "./components/admin/karats/KaratsManagement.tsx";
 import CategoriesManagement from "./components/admin/categories/CategoriesManagement.tsx";
 import GoldPricesManagement from "./components/admin/goldPrice/GoldPricesManagement.tsx";
 import ReservationsManagement from "./components/admin/reservations/ReservationsManagement.tsx";
+import DiscountsManagement from "./components/admin/discounts/DiscountsManagement.tsx";
+import AdminProtectedRoute from "./contexts/AdminProtectedRoute.tsx";
  
 
 const AdminRoutes = () => {
@@ -37,16 +39,21 @@ const AdminRoutes = () => {
 
   return (
     <Routes>
-      <Route path="login" element={<LoginForm />} />
-      <Route path="register" element={<RegisterForm />} />
+    <Route path="login" element={<LoginForm />} />
+    <Route path="register" element={<RegisterForm />} />
+
+    <Route element={<AdminProtectedRoute />}>
       <Route path="dashboard" element={<AdminDashboard />} />
       <Route path="items" element={<ItemsManagement />} />
       <Route path="karats" element={<KaratsManagement />} />
       <Route path="categories" element={<CategoriesManagement />} />
       <Route path="gold-prices" element={<GoldPricesManagement />} />
-      <Route path="reservations" element={<ReservationsManagement  />} />
-      <Route index element={<Navigate to="login" replace />} />
-    </Routes>
+      <Route path="reservations" element={<ReservationsManagement />} />
+      <Route path="discounts" element={<DiscountsManagement />} />
+    </Route>
+
+    <Route index element={<Navigate to="login" replace />} />
+  </Routes>
   );
 };
 

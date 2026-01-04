@@ -1,7 +1,7 @@
 // src/pages/admin/GoldPriceActions.tsx
 import React, { useState } from 'react';
-import type { AdminGoldPrice } from '../../../services/api';
-import { adminDeleteGoldPrice } from '../../../services/api';
+import type { AdminGoldPrice } from '../../../services/adminApi';
+import { adminDeleteGoldPrice } from '../../../services/adminApi';
 import { useToast } from '../../../contexts/ToastContext';
 
 interface GoldPriceActionsProps {
