@@ -59,7 +59,6 @@ const KaratActions: React.FC<KaratActionsProps> = ({
   return (
     <>
     <div className="flex items-center justify-center gap-2 relative group">
-      {/* Edit Button with Tooltip */}
       <div className="relative group/edit">
         <button
           onClick={() => onEdit(karat)}
@@ -70,14 +69,11 @@ const KaratActions: React.FC<KaratActionsProps> = ({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
           </svg>
         </button>
-        
-        {/* Edit Tooltip */}
         <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 opacity-0 invisible group-hover/edit:opacity-100 group-hover/edit:visible group-hover/edit:scale-100 transition-all duration-200 ease-out bg-amber-900/95 backdrop-blur-sm text-white text-xs font-bold px-3 py-1 rounded-lg shadow-xl border border-amber-800/50 whitespace-nowrap z-20 after:absolute after:-bottom-1 after:left-1/2 after:transform after:-translate-x-1/2 after:w-0 after:h-0 after:border-l-[6px] after:border-l-transparent after:border-r-[6px] after:border-r-transparent after:border-t-[6px] after:border-t-amber-900/95">
           Edit Karat
         </div>
       </div>
 
-      {/* Delete Button with Tooltip */}
       <div className="relative group/delete">
         <button
           onClick={handleDelete}
@@ -89,8 +85,6 @@ const KaratActions: React.FC<KaratActionsProps> = ({
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
           </svg>
         </button>
-        
-        {/* Delete Tooltip */}
         <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 opacity-0 invisible group-hover/delete:opacity-100 group-hover/delete:visible group-hover/delete:scale-100 transition-all duration-200 ease-out bg-red-900/95 backdrop-blur-sm text-white text-xs font-bold px-3 py-1 rounded-lg shadow-xl border border-red-800/50 whitespace-nowrap z-20 after:absolute after:-bottom-1 after:left-1/2 after:transform after:-translate-x-1/2 after:w-0 after:h-0 after:border-l-[6px] after:border-l-transparent after:border-r-[6px] after:border-r-transparent after:border-t-[6px] after:border-t-red-900/95">
           Delete Karat
         </div>
@@ -107,7 +101,6 @@ const KaratActions: React.FC<KaratActionsProps> = ({
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
               </div>
-
               {/* Title */}
               <h3 className="text-lg font-black text-gray-900 mb-3">
                 Delete Karat ({karat.displayName})?
@@ -116,8 +109,6 @@ const KaratActions: React.FC<KaratActionsProps> = ({
                 This action <span className="font-bold text-red-600">CANNOT</span> be undone. 
                 It will be permanently removed from your system.
               </p>
-
-              {/* Buttons */}
               <div className="flex gap-4">
                 <button
                   onClick={confirmDelete}

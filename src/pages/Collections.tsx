@@ -1,11 +1,9 @@
-// src/pages/Collections.tsx
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ProductCard from "../components/ProductCard";
 import { fetchItems,adminFetchCategories, type AdminCategory, type Item, type ItemSearchResponse } from "../services/api";
-
-const CATEGORIES = ["All Products", "Rings", "Necklaces", "Bracelets"];
+import Pagination from "../components/Pagination";
 
 export default function Collections() {
   const [categories, setCategories] = useState<AdminCategory[]>([]);
@@ -17,15 +15,13 @@ export default function Collections() {
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const size = 12;
 
-  // Fetch categories on mount
   useEffect(() => {
-    adminFetchCategories({ size: 100 }) // Fetch all categories
+    adminFetchCategories({ size: 100 }) 
       .then((res) => {
         setCategories(res.content);
       })
       .catch((err) => {
         console.error("Failed to fetch categories:", err);
-        // Keep "All Products" even if API fails
         setCategories([]);
       })
       .finally(() => {
@@ -79,7 +75,6 @@ export default function Collections() {
     }
   };
 
-  // Build category list with "All Products" first
   const categoryList = [
     "All Products",
     ...categories.map((cat) => cat.name),
@@ -138,25 +133,6 @@ export default function Collections() {
               })
             )}
           </div>
-          {/* <div className="flex flex-wrap gap-2 mb-6">
-            {CATEGORIES.map((cat) => {
-              const isActive = cat === category;
-              return (
-                <button
-                  key={cat}
-                  onClick={() => handleCategoryChange(cat)}
-                  className={
-                    "px-3 py-1.5 text-xs md:text-sm border rounded-md transition " +
-                    (isActive
-                      ? "bg-gray-800 text-white border-gray-800"
-                      : "bg-white text-gray-700 border-gray-200 hover:border-gray-400")
-                  }
-                >
-                  {cat}
-                </button>
-              );
-            })}
-          </div> */}
 
           {/* Grid */}
           {error && (
@@ -182,27 +158,11 @@ export default function Collections() {
           )}
 
           {/* Pagination */}
-          {data && data.page.totalPages > 1 && (
-            <div className="flex items-center justify-center space-x-4 mt-8">
-              <button
-                onClick={goPrev}
-                disabled={page === 0}
-                className="text-xs text-gray-600 disabled:text-gray-300 hover:text-gold-600"
-              >
-                &lt;
-              </button>
-              <span className="text-xs text-gray-700">
-                {page + 1} / {totalPages}
-              </span>
-              <button
-                onClick={goNext}
-                disabled={page >= totalPages - 1}
-                className="text-xs text-gray-600 disabled:text-gray-300 hover:text-gold-600"
-              >
-                &gt;
-              </button>
-            </div>
-          )}
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            onChange={setPage}
+          />
         </div>
       </main>
 

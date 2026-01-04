@@ -1,4 +1,3 @@
-// src/main.tsx - CLEAN VERSION (imports AdminDashboard)
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -31,7 +30,6 @@ const AdminRoutes = () => {
   
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-slate-900"><div>Loading...</div></div>;
   
-  // Only redirect login/register pages, NOT dashboard
   const currentPath = window.location.pathname;
   if (token && user && (currentPath.includes('login') || currentPath.includes('register'))) {
     return <Navigate to="/admin/dashboard" replace />;

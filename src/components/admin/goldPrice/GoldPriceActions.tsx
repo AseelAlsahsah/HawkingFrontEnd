@@ -1,4 +1,3 @@
-// src/pages/admin/GoldPriceActions.tsx
 import React, { useState } from 'react';
 import type { AdminGoldPrice } from '../../../services/adminApi';
 import { adminDeleteGoldPrice } from '../../../services/adminApi';
@@ -23,6 +22,15 @@ const GoldPriceActions: React.FC<GoldPriceActionsProps> = ({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
+  const getErrorMessage = (err: any, fallback = 'Something went wrong') => {
+    return (
+      err.response?.data?.status?.description ||
+      err?.response?.data?.message ||
+      err?.message ||
+      fallback
+    );
+  };
+
   const handleDelete = async () => {
     setDeleting(true);
     try {
@@ -30,9 +38,8 @@ const GoldPriceActions: React.FC<GoldPriceActionsProps> = ({
       addToast('Gold price deleted successfully!', 'success');
       await fetchGoldPrices(page);
     } catch (err: any) {
-      const errorMsg = err.response?.data?.message || 'Failed to delete gold price';
-      setError(errorMsg);
-      addToast(errorMsg, 'error');
+      setError(getErrorMessage(err, 'Failed to delete gold price'));
+      addToast(getErrorMessage(err, 'Failed to delete gold price'), 'error');
     } finally {
       setDeleting(false);
       setShowDeleteModal(false);
@@ -76,7 +83,7 @@ const GoldPriceActions: React.FC<GoldPriceActionsProps> = ({
         </div>
       </div>
 
-      {/* DELETE CONFIRMATION MODAL - EXACT KARAT STYLE */}
+      {/* DELETE CONFIRMATION MODAL */}
       {showDeleteModal && (
       <div className="fixed inset-0 bg-black/10 flex items-center justify-center z-50 p-4 animate-in fade-in zoom-in duration-200">
           <div className="bg-white/95 rounded-xl shadow-2xl max-w-md w-full mx-4 border border-gray-200 animate-in slide-in-from-bottom-4 duration-300">

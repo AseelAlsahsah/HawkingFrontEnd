@@ -1,4 +1,3 @@
-// src/contexts/AdminAuthContext.tsx
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -13,7 +12,7 @@ interface AuthState {
   loading: boolean;
   login: (username: string, password: string) => Promise<{ success: boolean; error?: string }>;
   register: (username: string, password: string, role: string) => Promise<{ success: boolean; message?: string; error?: string }>;
-  logout: () => Promise<void>;  // ← CHANGED TO ASYNC
+  logout: () => Promise<void>; 
   isAdmin: boolean;
 }
 
@@ -88,7 +87,7 @@ export const AdminAuthProvider: React.FC<AdminAuthProviderProps> = ({ children }
 
   const logout = async (): Promise<void> => {
     try {
-      // 1. Call backend logout API
+      // Call backend logout API
       if (token) {
         await fetch('http://localhost:9000/api/v1/admin/logout', {
           method: 'DELETE',
@@ -99,16 +98,16 @@ export const AdminAuthProvider: React.FC<AdminAuthProviderProps> = ({ children }
         });
       }
 
-      // 2. Clear ALL client storage
+      // Clear ALL client storage
       localStorage.removeItem('adminToken');
       localStorage.removeItem('adminUser');
       sessionStorage.clear();
 
-      // 3. Reset state
+      // Reset state
       setToken(null);
       setUser(null);
 
-      // 4. Redirect to login
+      // Redirect to login
       navigate('/admin/login', { replace: true });
     } catch (error) {
       console.error('Logout error:', error);
@@ -127,7 +126,7 @@ export const AdminAuthProvider: React.FC<AdminAuthProviderProps> = ({ children }
     loading,
     login,
     register,
-    logout,  // ← NOW ASYNC WITH BACKEND CALL
+    logout, 
     isAdmin: user?.role === 'ADMIN'
   };
 

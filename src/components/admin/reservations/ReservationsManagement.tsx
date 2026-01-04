@@ -1,17 +1,19 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { 
-  adminFetchReservations, 
+import { useNavigate } from 'react-router-dom';
+import {
+  adminFetchReservations,
   adminUpdateReservationStatus
 } from '../../../services/adminApi';
-import type { 
+import type {
   AdminReservation,
-  PageMeta 
+  PageMeta
 } from '../../../services/adminApi';
+import Pagination from '../../Pagination';
+import ReservationDetailsModal from './ReservationDetailsModal';
 
 const ReservationsManagement: React.FC = () => {
   const navigate = useNavigate();
-  
+
   const [reservations, setReservations] = useState<AdminReservation[]>([]);
   const [page, setPage] = useState(0);
   const [pageMeta, setPageMeta] = useState<PageMeta>({ size: 20, number: 0, totalElements: 0, totalPages: 1 });
@@ -28,31 +30,31 @@ const ReservationsManagement: React.FC = () => {
       fallback
     );
   };
-  
-  const fetchReservations = useCallback(async (pageNum: number = page) => {
+
+  const fetchReservations = useCallback(async (pageNum: number = 0) => {
     try {
       setLoading(true);
       setError('');
-      const data = await adminFetchReservations({ page: pageNum, size: 20 });
+      const data = await adminFetchReservations({ page: pageNum, size: 10 });
       setReservations(data.content);
       setPageMeta(data.page);
+      setPage(data.page.number);
     } catch (err: any) {
-      setError(getErrorMessage(err, 'Failed to load items'));
+      setError(getErrorMessage(err, 'Failed to load reservations'));
       setReservations([]);
     } finally {
       setLoading(false);
     }
-  }, [page]);
+  }, []);
 
   useEffect(() => {
-    fetchReservations();
-  }, [fetchReservations]);
+    fetchReservations(page);
+  }, [page, fetchReservations]);
 
   const handleStatusUpdate = async (reservationId: number, newStatus: string) => {
     try {
       setUpdatingId(reservationId);
       await adminUpdateReservationStatus(reservationId, newStatus);
-      // Refresh the list
       await fetchReservations();
     } catch (err: any) {
       setError(`Failed to update status: ${err.message}`);
@@ -80,11 +82,11 @@ const ReservationsManagement: React.FC = () => {
 
   const formatDate = (dateString: string) => {
     return new Intl.DateTimeFormat('en-JO', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
     }).format(new Date(dateString));
-    };
+  };
 
 
   if (loading) {
@@ -144,7 +146,6 @@ const ReservationsManagement: React.FC = () => {
               All Reservations ({pageMeta.totalElements})
             </h2>
           </div>
-          
           <div className="overflow-x-auto">
             <table className="w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -165,12 +166,12 @@ const ReservationsManagement: React.FC = () => {
                       <div className="text-sm font-semibold text-gray-900">{reservation.username}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
-                        <div className="text-sm text-gray-900 font-medium">
+                      <div className="text-sm text-gray-900 font-medium">
                         {formatDate(reservation.createdAt)}
-                        </div>
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
-                        <span className="text-sm text-gray-900 font-medium">{reservation.items.length} items</span>
+                      <span className="text-sm text-gray-900 font-medium">{reservation.items.length} items</span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       <div className="text-sm font-mono text-gray-900">{reservation.phoneNumber}</div>
@@ -197,15 +198,13 @@ const ReservationsManagement: React.FC = () => {
                           <option value="CANCELLED">Cancelled</option>
                           <option value="CLOSED">Closed</option>
                         </select>
-                        
                         <button
-                            onClick={() => setSelectedReservation(reservation)}
-                            className="px-2 py-1 text-xs font-bold text-blue-800 whitespace-nowrap"
-                            title="View all items"
+                          onClick={() => setSelectedReservation(reservation)}
+                          className="px-2 py-1 text-xs font-bold text-blue-800 whitespace-nowrap"
+                          title="View all items"
                         >
-                        View Details
+                          View Details
                         </button>
-
                         {updatingId === reservation.id && (
                           <div className="w-4 h-4 border-2 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
                         )}
@@ -216,133 +215,22 @@ const ReservationsManagement: React.FC = () => {
               </tbody>
             </table>
           </div>
-
-          {/* Pagination */}
-          {pageMeta.totalPages > 1 && (
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
-              <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-500">
-                  Showing <span className="font-semibold">{page * pageMeta.size + 1}</span> to{' '}
-                  <span className="font-semibold">{Math.min((page + 1) * pageMeta.size, pageMeta.totalElements)}</span> of{' '}
-                  <span className="font-semibold">{pageMeta.totalElements}</span> results
-                </div>
-                <div className="flex gap-1">
-                  <button
-                    onClick={() => setPage(p => Math.max(0, p - 1))}
-                    disabled={page === 0}
-                    className="px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    onClick={() => setPage(p => Math.min(pageMeta.totalPages - 1, p + 1))}
-                    disabled={page === pageMeta.totalPages - 1}
-                    className="px-3 py-2 text-sm font-semibold text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                  >
-                    Next
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Items Modal */}
-            {selectedReservation && (
-            <div className="fixed inset-0 bg-black/10  flex items-center justify-center z-50 p-4">
-                <div className="bg-white/95 rounded-xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto border border-gray-200">
-                {/* Header */}
-                <div className="sticky top-0 bg-white/100 border-b border-gray-200 p-6 rounded-t-2xl">
-                    <div className="flex items-center justify-between">
-                    <div>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-1">Reservation #{selectedReservation.id}</h2>
-                        <p className="text-sm text-gray-500">
-                        {selectedReservation.username} • {selectedReservation.phoneNumber}
-                        </p>
-                    </div>
-                    <button
-                        onClick={() => setSelectedReservation(null)}
-                        className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-xl transition-all group"
-                    >
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                    </div>
-                </div>
-
-                {/* Items Grid */}
-                <div className="p-6">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 mb-8">
-                    {selectedReservation.items.map((itemDetail) => (
-                        <div key={itemDetail.id} className="group bg-white border border-gray-200 rounded-xl p-4 hover:shadow-xl hover:border-amber-300 hover:-translate-y-1 transition-all duration-300 overflow-hidden shadow-sm">
-                        <div className="flex flex-col h-full">
-                            {/* Image */}
-                            <div className="w-full h-20 mb-3 bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg overflow-hidden flex-shrink-0">
-                            <img 
-                                src={itemDetail.item.imageUrl} 
-                                alt={itemDetail.item.name}
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                e.currentTarget.style.display = 'none';
-                                (e.currentTarget.parentElement as HTMLElement).innerHTML = `
-                                    <div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                                    <span class="text-xs text-gray-500 font-medium">No Image</span>
-                                    </div>
-                                `;
-                                }}
-                            />
-                            </div>
-                            
-                            {/* Content */}
-                            <div className="flex-1 min-h-0">
-                            <h4 className="font-semibold text-gray-900 text-sm mb-2 leading-tight line-clamp-2 group-hover:text-gray-950">
-                                {itemDetail.item.name}
-                            </h4>
-                            <div className="space-y-1 mb-3">
-                                <div className="text-xs font-mono text-gray-700 bg-gray-100 px-2 py-0.5 rounded w-fit">
-                                {itemDetail.item.code}
-                                </div>
-                                <div className="text-xs text-gray-600">
-                                {itemDetail.item.karat.displayName} • {itemDetail.item.weight}g
-                                </div>
-                            </div>
-                            
-                            {/* Price - Fixed overflow */}
-                            <div className="flex items-baseline justify-between pt-2 border-t border-gray-100">
-                                <span className="text-xs font-semibold text-amber-700 bg-amber-100 px-2 py-0.5 rounded w-fit">
-                                x{itemDetail.quantity}
-                                </span>
-                                <span className="text-base font-bold text-gray-900 whitespace-nowrap tabular-nums">
-                                {formatPrice(itemDetail.item.priceBeforeDiscount * itemDetail.quantity)}
-                                </span>
-                            </div>
-                            </div>
-                        </div>
-                        </div>
-                    ))}
-                    </div>
-                    
-                    {/* Total Summary */}
-                    <div className="bg-gray-100 p-6 border border-gray-200 -mx-6 mb-6">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-center sm:text-left">
-                        <div>
-                        <p className="text-sm text-gray-600 mb-1">Total ({selectedReservation.items.length} items)</p>
-                        <p className="text-3xl font-bold bg-gray-800 bg-clip-text text-transparent">
-                            {formatPrice(selectedReservation.totalPrice)}
-                        </p>
-                        </div>
-                        <div className="flex flex-col sm:flex-row gap-3 pt-1 sm:pt-0">
-                        <span className={`px-4 py-2 text-sm font-semibold rounded-xl border ${getStatusColor(selectedReservation.status)}`}>
-                            {selectedReservation.status}
-                        </span>
-                        </div>
-                    </div>
-                    </div>
-                </div>
-                </div>
-            </div>
-            )}
         </div>
+        {/* Items Modal */}
+        {selectedReservation && (
+          <ReservationDetailsModal
+            reservation={selectedReservation}
+            onClose={() => setSelectedReservation(null)}
+          />
+        )}
+        {/* Pagination */}
+        {pageMeta.totalPages > 1 && (
+          <Pagination
+            page={page}
+            totalPages={pageMeta.totalPages}
+            onChange={(p) => fetchReservations(p)}
+          />
+        )}
       </div>
     </div>
   );

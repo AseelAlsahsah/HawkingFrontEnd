@@ -6,28 +6,59 @@ import Footer from '../components/Footer';
 import ProductCard from '../components/ProductCard';
 import { fetchItems } from '../services/api';
 import type { ItemSearchResponse } from '../services/api';
+import Pagination from "../components/Pagination";
 
 export default function SearchPage() {
   const [searchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
   const [results, setResults] = useState<ItemSearchResponse>({ content: [], page: { size: 0, number: 0, totalElements: 0, totalPages: 0 } });
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(0);
+
+  // useEffect(() => {
+  //   if (query) {
+  //       searchItems(0);  
+  //   } else {
+  //       setResults({ content: [], page: { size: 0, number: 0, totalElements: 0, totalPages: 0 } });
+  //   }
+  // }, [query]);
 
   useEffect(() => {
     if (query) {
-        searchItems(0);  
+      setPage(0);
+      searchItems(0);
     } else {
-        setResults({ content: [], page: { size: 0, number: 0, totalElements: 0, totalPages: 0 } });
+      setResults({
+        content: [],
+        page: { size: 0, number: 0, totalElements: 0, totalPages: 0 },
+      });
     }
   }, [query]);
 
-  const searchItems = async (page = 0) => {
+  // const searchItems = async (page = 0) => {
+  //   setLoading(true);
+  //   try {
+  //     const data = await fetchItems({
+  //       name: query,
+  //       page,
+  //       size: 20
+  //     });
+  //     setResults(data);
+  //   } catch (error) {
+  //     console.error('Search failed:', error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  const searchItems = async (p = 0) => {
     setLoading(true);
+    setPage(p);
     try {
       const data = await fetchItems({
         name: query,
-        page,
-        size: 20
+        page: p,
+        size: 20,
       });
       setResults(data);
     } catch (error) {
@@ -89,23 +120,11 @@ export default function SearchPage() {
                 ))}
               </div>
               
-              {results.page.totalPages > 1 && (
-                <div className="flex justify-center space-x-2">
-                  {Array.from({ length: results.page.totalPages }, (_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => searchItems(i)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                        results.page.number === i
-                          ? 'bg-gold-600 text-white'
-                          : 'bg-white border border-gray-200 hover:bg-gray-50 text-gray-700'
-                      }`}
-                    >
-                      {i + 1}
-                    </button>
-                  ))}
-                </div>
-              )}
+              <Pagination
+                page={page}
+                totalPages={results.page.totalPages}
+                onChange={(p) => searchItems(p)}
+              />
             </>
           )}
         </div>

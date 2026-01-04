@@ -111,10 +111,13 @@ export async function adminUpdateItem(id: number, item: Partial<AdminItem>) {
   return response.data;
 }
 
-export async function adminDeleteItem(code: string) { 
+export async function adminDeactivateItem(code: string) { 
   await publicApi.delete(`/items/code/${code}`); 
 }
 
+export async function adminDeleteItem(id: number) { 
+  await publicApi.delete(`/items/${id}`); 
+}
 // ------------------------ admin categories ----------------------
 export interface AdminCategory {
   id: number;

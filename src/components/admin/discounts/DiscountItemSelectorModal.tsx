@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { searchItemsByCode } from '../../../services/api';
 
 interface Item {
@@ -29,9 +29,12 @@ const DiscountItemSelectorModal: React.FC<Props> = ({
 }) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Item[]>([]);
-  const [selected, setSelected] = useState<string[]>([]);
+  const [selectedCodes, setSelectedCodes] = useState<string[]>([]);
+  const [selectedItems, setSelectedItems] = useState<Record<string, Item>>({});
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  /* ------------------------------- FETCH LOGIC ------------------------------- */
 
   useEffect(() => {
     if (!open) return;
@@ -42,7 +45,7 @@ const DiscountItemSelectorModal: React.FC<Props> = ({
     }
 
     if (!query.trim()) {
-      setResults([]);
+      setResults([]); // 👈 allowed now, selected items still render
       return;
     }
 
@@ -59,22 +62,54 @@ const DiscountItemSelectorModal: React.FC<Props> = ({
     return () => clearTimeout(timeout);
   }, [query, mode, existingItems, open]);
 
-  const toggleSelect = (code: string) => {
-    setSelected(prev =>
-      prev.includes(code) ? prev.filter(c => c !== code) : [...prev, code]
+  /* ---------------------------- SELECTION HANDLING --------------------------- */
+
+  const toggleSelect = (item: Item) => {
+    setSelectedCodes(prev =>
+      prev.includes(item.code)
+        ? prev.filter(c => c !== item.code)
+        : [...prev, item.code]
     );
+
+    setSelectedItems(prev => {
+      if (prev[item.code]) {
+        const copy = { ...prev };
+        delete copy[item.code];
+        return copy;
+      }
+      return { ...prev, [item.code]: item };
+    });
   };
 
   const handleSubmit = async () => {
-    if (selected.length === 0) return;
+    if (selectedCodes.length === 0) return;
     setSubmitting(true);
     try {
-      await onConfirm(selected);
-      setSelected([]);
+      await onConfirm(selectedCodes);
+      setSelectedCodes([]);
+      setSelectedItems({});
       onClose();
     } finally {
       setSubmitting(false);
     }
+  };
+
+  /* -------------------------- MERGED DISPLAY LIST ---------------------------- */
+
+  const displayItems = useMemo(() => {
+    const selectedList = Object.values(selectedItems);
+    const selectedSet = new Set(selectedCodes);
+
+    const unselectedResults = results.filter(
+      item => !selectedSet.has(item.code)
+    );
+
+    return [...selectedList, ...unselectedResults];
+  }, [results, selectedItems, selectedCodes]);
+
+  const resetSelection = () => {
+    setSelectedCodes([]);
+    setSelectedItems({});
   };
 
   if (!open) return null;
@@ -87,9 +122,16 @@ const DiscountItemSelectorModal: React.FC<Props> = ({
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-100 flex justify-between">
           <h3 className="text-lg font-semibold">
-            {mode === 'add' ? 'Add Items to Discount' : 'Remove Items from Discount'}
+            {mode === 'add'
+              ? 'Add Items to Discount'
+              : 'Remove Items from Discount'}
           </h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <button
+            onClick={() => {
+              resetSelection();
+              onClose();
+            }}
+            className="text-gray-400 hover:text-gray-600">
             ✕
           </button>
         </div>
@@ -110,32 +152,41 @@ const DiscountItemSelectorModal: React.FC<Props> = ({
         <div className="px-6 py-4 max-h-[420px] overflow-y-auto space-y-2">
           {loading && <p className="text-sm text-gray-500">Searching…</p>}
 
-          {!loading && results.length === 0 && (
+          {!loading && displayItems.length === 0 && (
             <p className="text-sm text-gray-500">No items found.</p>
           )}
 
-          {results.map(item => {
+          {selectedCodes.length > 0 && (
+            <div className="text-xs text-gray-500 font-semibold mt-2 mb-1">
+              Selected items
+            </div>
+          )}
+
+          {displayItems.map(item => {
             const disabled =
               mode === 'add' && existingCodes.has(item.code);
 
             return (
               <label
                 key={item.code}
-                className={`flex items-center gap-4 p-3 rounded-lg border ${
-                  disabled
-                    ? 'bg-gray-50 border-gray-200 opacity-60'
+                className={`flex items-center gap-4 p-3 rounded-lg border transition ${disabled
+                  ? 'bg-gray-50 border-gray-200 opacity-60'
+                  : selectedCodes.includes(item.code)
+                    ? 'border-emerald-300 bg-emerald-50'
                     : 'border-gray-200 hover:bg-gray-50'
-                }`}
+                  }`}
               >
                 <input
                   type="checkbox"
                   disabled={disabled}
-                  checked={selected.includes(item.code)}
-                  onChange={() => toggleSelect(item.code)}
+                  checked={selectedCodes.includes(item.code)}
+                  onChange={() => toggleSelect(item)}
                 />
                 <div className="flex-1">
                   <p className="text-sm font-semibold">{item.name}</p>
-                  <p className="text-xs text-gray-500 font-mono">{item.code}</p>
+                  <p className="text-xs text-gray-500 font-mono">
+                    {item.code}
+                  </p>
                 </div>
                 {disabled && (
                   <span className="text-xs text-amber-600 font-semibold">
@@ -150,19 +201,22 @@ const DiscountItemSelectorModal: React.FC<Props> = ({
         {/* Footer */}
         <div className="px-6 py-4 border-t border-gray-100 flex justify-end gap-3">
           <button
-            onClick={onClose}
+            onClick={() => {
+              resetSelection();
+              onClose();
+            }}
             className="px-4 py-2 text-sm bg-gray-100 rounded-lg"
           >
             Cancel
           </button>
           <button
-            disabled={selected.length === 0 || submitting}
+            disabled={selectedCodes.length === 0 || submitting}
             onClick={handleSubmit}
             className="px-4 py-2 text-sm font-semibold text-white rounded-lg bg-gradient-to-r from-emerald-500 to-emerald-600 disabled:opacity-50"
           >
             {mode === 'add'
-              ? `Add ${selected.length} item(s)`
-              : `Remove ${selected.length} item(s)`}
+              ? `Add ${selectedCodes.length} item(s)`
+              : `Remove ${selectedCodes.length} item(s)`}
           </button>
         </div>
       </div>

@@ -44,23 +44,28 @@ const KaratFormModal: React.FC<KaratFormModalProps> = ({
     setError('');
   }, [editingKarat, showForm]);
 
+   const getErrorMessage = (err: any, fallback = 'Something went wrong') => {
+    return (
+      err?.response?.data?.message ||
+      err.response?.data?.status?.description ||
+      err?.message ||
+      fallback
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!formData.name.trim() || !formData.displayName.trim()) {
       setError('Please fill all required fields');
       return;
     }
-
     try {
       setLoading(true);
       setError('');
-
       const payload = {
         name: formData.name.trim(),
         displayName: formData.displayName.trim()
       };
-
       if (editingKarat) {
         await adminUpdateKarat(editingKarat.id, payload);
         addToast(`"${payload.displayName}" updated successfully`, 'success');
@@ -68,16 +73,10 @@ const KaratFormModal: React.FC<KaratFormModalProps> = ({
         await adminCreateKarat(payload);
         addToast(`"${payload.displayName}" created successfully`, 'success');
       }
-
       onClose();
       await onSubmitSuccess(page);
     } catch (err: any) {
-      const errorMsg =
-        err.response?.data?.status?.description ||
-        err.response?.data?.message ||
-        err.message ||
-        'Something went wrong';
-      setError(errorMsg);
+      setError(getErrorMessage(err, 'Something went wrong'));
     } finally {
       setLoading(false);
     }
@@ -87,9 +86,7 @@ const KaratFormModal: React.FC<KaratFormModalProps> = ({
 
   return (
     <>
-      {/* Overlay */}
       <div className="fixed inset-0 bg-black/10 backdrop-blur-sm z-50 animate-in fade-in duration-200" />
-
       {/* Modal */}
       <div className="fixed inset-0 flex items-center justify-center z-50 p-4 animate-in fade-in zoom-in duration-200">
         <div className="bg-white/95 rounded-xl shadow-2xl max-w-md w-full border border-gray-200 animate-in slide-in-from-bottom-4 duration-300">
@@ -108,7 +105,6 @@ const KaratFormModal: React.FC<KaratFormModalProps> = ({
                 </svg>
               </button>
             </div>
-
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
@@ -124,7 +120,6 @@ const KaratFormModal: React.FC<KaratFormModalProps> = ({
                   required
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Display Name <span className="text-red-500">*</span>
@@ -157,11 +152,9 @@ const KaratFormModal: React.FC<KaratFormModalProps> = ({
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
                       Saving...
                     </>
-                  ) : editingKarat ? (
-                    'Update Karat'
-                  ) : (
-                    'Create Karat'
-                  )}
+                  ) : editingKarat ? 
+                    ('Update Karat') : ('Create Karat')
+                  }
                 </button>
 
                 <button

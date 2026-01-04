@@ -29,7 +29,6 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
   const { addToast } = useToast();
 
   useEffect(() => {
@@ -44,23 +43,28 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
     setError('');
   }, [editingCategory, showForm]);
 
+  const getErrorMessage = (err: any, fallback = 'Something went wrong') => {
+    return (
+      err.response?.data?.status?.description ||
+      err?.response?.data?.message ||
+      err?.message ||
+      fallback
+    );
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!formData.name.trim() || !formData.description.trim()) {
       setError('Please fill all required fields');
       return;
     }
-
     try {
       setLoading(true);
       setError('');
-
       const payload = {
         name: formData.name.trim(),
         description: formData.description.trim()
       };
-
       if (editingCategory) {
         await adminUpdateCategory(editingCategory.id, payload);
         addToast(`"${payload.name}" updated successfully`, 'success');
@@ -68,16 +72,10 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
         await adminCreateCategory(payload);
         addToast(`"${payload.name}" created successfully`, 'success');
       }
-
       onClose();
       await onSubmitSuccess(page);
     } catch (err: any) {
-      const errorMsg =
-        err.response?.data?.status?.description ||
-        err.response?.data?.message ||
-        err.message ||
-        'Something went wrong';
-      setError(errorMsg);
+      setError(getErrorMessage(err))
     } finally {
       setLoading(false);
     }
@@ -87,9 +85,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
 
   return (
     <>
-      {/* Overlay */}
       <div className="fixed inset-0 bg-black/10 backdrop-blur-sm z-50 animate-in fade-in duration-200" />
-
       {/* Modal */}
       <div className="fixed inset-0 flex items-center justify-center z-50 p-4 animate-in fade-in zoom-in duration-200">
         <div className="bg-white/95 rounded-xl shadow-2xl max-w-md w-full border border-gray-200 animate-in slide-in-from-bottom-4 duration-300">
@@ -108,7 +104,6 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                 </svg>
               </button>
             </div>
-
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
@@ -123,7 +118,6 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                   required
                 />
               </div>
-
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Description <span className="text-red-500">*</span>
@@ -161,7 +155,6 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                     'Create Category'
                   )}
                 </button>
-
                 <button
                   type="button"
                   onClick={onClose}

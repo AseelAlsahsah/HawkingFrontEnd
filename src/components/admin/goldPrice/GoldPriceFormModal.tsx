@@ -63,41 +63,44 @@ const GoldPriceFormModal: React.FC<GoldPriceFormModalProps> = ({
     }
   }, [editingGoldPrice]);
 
+  const getErrorMessage = (err: any, fallback = 'Something went wrong') => {
+    return (
+      err.response?.data?.status?.description ||
+      err?.response?.data?.message ||
+      err?.message ||
+      fallback
+    );
+  };
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.karatName || !formData.pricePerGram || !formData.effectiveDate) {
       setError('Please fill all fields');
       return;
     }
-
     const pricePerGram = parseFloat(formData.pricePerGram);
     if (isNaN(pricePerGram) || pricePerGram <= 0) {
       setError('Please enter a valid price');
       return;
     }
-
     try {
       setLoading(true);
       setError('');
-
       const payload = {
         karatName: formData.karatName,
         pricePerGram,
         effectiveDate: `${formData.effectiveDate}T00:00:00`,
         isActive: formData.isActive
       };
-
       if (editingGoldPrice) {
         await adminUpdateGoldPrice(editingGoldPrice.id, payload);
       } else {
         await adminCreateGoldPrice(payload);
       }
-
       onClose();
-      await onSubmitSuccess(page); // ✅ INSIDE TRY BLOCK
+      await onSubmitSuccess(page); 
     } catch (err: any) {
-      const errorMsg = err.response?.data?.message || err.message || 'Something went wrong';
-      setError(errorMsg);
+      setError(getErrorMessage(err));
     } finally {
       setLoading(false);
     }
@@ -160,6 +163,7 @@ const GoldPriceFormModal: React.FC<GoldPriceFormModalProps> = ({
                   type="number"
                   step="0.001"
                   min="0"
+                  placeholder='price per (g)'
                   value={formData.pricePerGram}
                   onChange={(e) => setFormData({ ...formData, pricePerGram: e.target.value })}
                   disabled={loading}

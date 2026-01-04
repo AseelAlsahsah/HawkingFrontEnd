@@ -6,11 +6,11 @@ import type { AdminKarat } from '../../../services/api';
 import KaratFormModal from './KaratFormModal';
 import KaratActions from './KaratActions';
 import { useNavigate } from 'react-router-dom';  
+import Pagination from '../../Pagination';
 
 const KaratsManagement: React.FC = () => {
   const navigate = useNavigate();  
 
-  // Core States
   const [karats, setKarats] = useState<AdminKarat[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -21,8 +21,8 @@ const KaratsManagement: React.FC = () => {
 
   const getErrorMessage = (err: any, fallback = 'Something went wrong') => {
     return (
-      err?.response?.data?.message ||
       err.response?.data?.status?.description ||
+      err?.response?.data?.message ||
       err?.message ||
       fallback
     );
@@ -32,13 +32,13 @@ const KaratsManagement: React.FC = () => {
     setLoading(true);
     setError('');
     try {
-      const data = await adminFetchKarats({ page: pageNum, size: 20 });
+      const data = await adminFetchKarats({ page: pageNum, size: 10 });
       setKarats(data.content || []);
       setPage(data.page?.number || 0);
       setTotalPages(data.page?.totalPages || 0);
     } catch (err: any) {
       console.error('Fetch karats error:', err);
-      setError(getErrorMessage(err, 'Failed to load items'));
+      setError(getErrorMessage(err, 'Fetch karats error'));
       setKarats([]);
     } finally {
       setLoading(false);
@@ -187,30 +187,11 @@ const KaratsManagement: React.FC = () => {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center justify-between">
-            <div className="text-sm text-gray-700">
-              Page {page + 1} of {totalPages}
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                disabled={page === 0}
-                onClick={() => fetchKarats(page - 1)}
-                className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-              >
-                Previous
-              </button>
-              <span className="text-sm font-semibold text-gray-700 px-4 py-2 bg-gray-100 rounded-xl">
-                Page {page + 1}
-              </span>
-              <button
-                disabled={page >= totalPages - 1}
-                onClick={() => fetchKarats(page + 1)}
-                className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-              >
-                Next
-              </button>
-            </div>
-          </div>
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            onChange={(p) => fetchKarats(p)}
+          />
         )}
       </div>
 

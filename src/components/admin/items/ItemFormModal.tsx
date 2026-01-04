@@ -154,15 +154,12 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
 
 return (
   <>
-    {/* Overlay – SAME as GoldPrice */}
     <div className="fixed inset-0 bg-black/10 backdrop-blur-sm z-50 animate-in fade-in duration-200" />
-
     {/* Modal */}
     <div className="fixed inset-0 flex items-center justify-center z-50 p-4 animate-in fade-in zoom-in duration-200">
       <div className="bg-white/95 rounded-xl shadow-2xl max-w-4xl w-full border border-gray-200 animate-in slide-in-from-bottom-4 duration-300 max-h-[95vh] overflow-y-auto">
         <div className="p-6 pb-4">
-
-          {/* Header – SAME hierarchy as GoldPrice */}
+          {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">
               {editingItem ? `Edit ${editingItem.name}` : 'New Item'}
@@ -176,8 +173,7 @@ return (
               </svg>
             </button>
           </div>
-
-          {/* Error – SAME as GoldPrice */}
+          {/* Error */}
           {modalError && (
             <div className="p-3 mb-5 bg-red-50 border border-red-200 rounded-xl">
               <p className="text-sm font-semibold text-red-800">
@@ -185,21 +181,18 @@ return (
               </p>
             </div>
           )}
-
           {/* Form – GRID KEPT */}
           <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-
-            {/* Inputs – SAME INPUT STYLE AS GoldPrice */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Item Code *</label>
               <input
                 value={formData.code}
                 onChange={(e) => setFormData({ ...formData, code: e.target.value })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md"
+                placeholder='Item Code'
                 required
               />
             </div>
-
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Category *</label>
               <select
@@ -214,17 +207,16 @@ return (
                 ))}
               </select>
             </div>
-
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Item Name *</label>
               <input
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md"
+                placeholder='Item Name'
                 required
               />
             </div>
-
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Karat *</label>
               <select
@@ -240,50 +232,49 @@ return (
                 ))}
               </select>
             </div>
-
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-3">Weight (grams) *</label>
               <input 
                 required 
                 type="number" step="0.01"
                 value={formData.weight} 
+                placeholder='Item Weight (g)'
                 onChange={(e) => setFormData({...formData, weight: e.target.value === '' ? '' : Number(e.target.value),})}
                 className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-400/50 focus:border-blue-400 text-s shadow-sm transition-all duration-300"
               />
             </div>
-
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-3">Factory Price ($/gram) *</label>
               <input 
                 required 
                 type="number" step="0.01" 
-                value={formData.factoryPrice} 
+                value={formData.factoryPrice}
+                placeholder='Item Factory price per (g)' 
                 onChange={(e) => setFormData({...formData, factoryPrice: e.target.value === '' ? '' : Number(e.target.value),})}
                 className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-400/50 focus:border-blue-400 text-s shadow-sm transition-all duration-300"
               />
             </div>
-
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-3">Stock Count *</label>
               <input 
                 required 
                 type="number" 
                 value={formData.inStockCount} 
+                placeholder='In Stock Count'
                 onChange={(e) => setFormData({...formData, inStockCount: e.target.value === '' ? '' : Number(e.target.value),})}
                 className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-400/50 focus:border-emerald-400 text-s shadow-sm transition-all duration-300"
               />
             </div>
-
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-3">Reserved Count</label>
               <input 
                 type="number" 
                 value={formData.reservedCount} 
+                placeholder='Reserved Items Count'
                 onChange={(e) => setFormData({...formData, reservedCount: e.target.value === '' ? '' : Number(e.target.value),})}
                 className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-orange-400/50 focus:border-orange-400 text-s shadow-sm transition-all duration-300"
               />
             </div>
-
             <div className="lg:col-span-2">
               <label className="block text-sm font-bold text-gray-700 mb-3">Image URL *</label>
               <input 
@@ -295,7 +286,6 @@ return (
               />
               <p className="text-xs text-gray-500 mt-2">Use Google Drive URLs</p>
             </div>
-
             <div className="lg:col-span-2">
               <label className="block text-sm font-bold text-gray-700 mb-3">Description</label>
               <textarea 
@@ -306,7 +296,6 @@ return (
                 placeholder="Optional: Add item description..."
               />
             </div>
-
             <div className="lg:col-span-2">
               <label className="block text-sm font-bold text-gray-700 mb-3">Status</label>
               <label className="relative inline-flex items-center cursor-pointer">
@@ -322,8 +311,7 @@ return (
                 </span>
               </label>
             </div>
-
-            {/* Actions – SAME as GoldPrice */}
+            {/* Actions */}
               <div className="lg:col-span-2 flex gap-3 pt-2">
                 <button
                   type="submit"
@@ -341,7 +329,6 @@ return (
                   Cancel
                 </button>
               </div>
-
             </form>
           </div>
         </div>

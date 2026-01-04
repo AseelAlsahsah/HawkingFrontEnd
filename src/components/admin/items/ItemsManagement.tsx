@@ -8,18 +8,17 @@ import AdminCodeSearchBar from '../AdminCodeSearchBar';
 import ItemActions from './ItemActions';
 import ItemFormModal from './ItemFormModal';
 import { useNavigate } from 'react-router-dom';  
+import Pagination from '../../Pagination';
 
 const ItemsManagement: React.FC = () => {
   const navigate = useNavigate();  
   
   const [categories, setCategories] = useState<AdminCategory[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
-
-  // Core States
   const [items, setItems] = useState<AdminItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(''); // ✅ List page errors only
-  const [modalError, setModalError] = useState(''); // ✅ Modal-specific errors
+  const [error, setError] = useState(''); 
+  const [modalError, setModalError] = useState('');
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -27,6 +26,11 @@ const ItemsManagement: React.FC = () => {
   const [codeSearchActive, setCodeSearchActive] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingItem, setEditingItem] = useState<AdminItem | null>(null);
+  const getImageSrc = (url?: string) => {
+    return url && url.trim() !== ''
+      ? url
+      : 'placeholder.png';
+  };
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -34,7 +38,6 @@ const ItemsManagement: React.FC = () => {
       const data = await adminFetchCategories({ page: 0, size: 20 });
       setCategories(data.content || []);
     } catch (err: any) {
-      console.error('Failed to fetch categories:', err);
       setCategories([]);
     } finally {
       setCategoriesLoading(false);
@@ -65,7 +68,6 @@ const ItemsManagement: React.FC = () => {
       setPage(data.page?.number || 0);
       setTotalPages(data.page?.totalPages || 0);
     } catch (err: any) {
-      console.error('Fetch items error:', err);
       setError(getErrorMessage(err, 'Failed to load items'));
       setItems([]);
     } finally {
@@ -75,12 +77,9 @@ const ItemsManagement: React.FC = () => {
 
   const fetchItemByCode = useCallback(async (code: string): Promise<AdminItem> => {
     try {
-      console.log('Fetching full item by code:', code);
       const fullItem = await adminGetItemByCode(code);
-      console.log('Found full item:', fullItem.id, fullItem.code);
       return fullItem;
     } catch (err: any) {
-      console.error('Failed to fetch item by code:', code, err);
       throw new Error(`Item "${code}" not found in database`);
     }
   }, []);
@@ -162,17 +161,13 @@ const ItemsManagement: React.FC = () => {
 
   const handleNewItem = () => {
     setEditingItem(null);
-    setModalError(''); // ✅ Clear modal error
+    setModalError(''); 
     setShowForm(true);
   };
 
   const handleEdit = async (item: AdminItem) => {
-    console.log('🔍 Editing item:', item.id, item.code, 'isSearch:', nameSearchActive || codeSearchActive);
-    
     let fullItem: AdminItem = item;
-    
     if ((nameSearchActive || codeSearchActive) || !item.id || item.id === 0) {
-      console.log('🔄 Search result detected - fetching full item...');
       try {
         fullItem = await fetchItemByCode(item.code!);
       } catch (err: any) {
@@ -180,22 +175,20 @@ const ItemsManagement: React.FC = () => {
         return;
       }
     }
-    
     setEditingItem(fullItem);
-    setModalError(''); // ✅ Clear modal error
+    setModalError(''); 
     setShowForm(true);
   };
 
   const handleFormClose = () => {
     setShowForm(false);
     setEditingItem(null);
-    setModalError(''); // ✅ Clear modal error
+    setModalError('');
   };
 
-  // ✅ FIXED: Don't set list error on form success
   const handleFormSuccess = async (pageNum: number, category: string) => {
-    setError(''); // Clear list error
-    setModalError(''); // Clear modal error
+    setError(''); 
+    setModalError('');
     await fetchItems(pageNum, category);
   };
 
@@ -206,7 +199,7 @@ const ItemsManagement: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-amber-50 flex items-center justify-center p-8">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8">
         <div className="text-center">
           <div className="w-16 h-16 mx-auto bg-gradient-to-br from-gray-200 to-gray-300 rounded-2xl flex items-center justify-center mb-6 shadow-lg animate-pulse">
             <div className="w-8 h-8 bg-white rounded-xl"></div>
@@ -262,7 +255,7 @@ const ItemsManagement: React.FC = () => {
             {/* Name Search */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                <span>🔍</span> Search Name
+              Item Name
               </label>
               <AdminSearchBar 
                 onSearch={(results) => handleSearch('name', results)}
@@ -273,7 +266,7 @@ const ItemsManagement: React.FC = () => {
             {/* Code Search */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                <span>📝</span> Search Code
+              Item Code
               </label>
               <AdminCodeSearchBar 
                 onSearch={(results: Item[]) => handleSearch('code', results)}
@@ -312,34 +305,16 @@ const ItemsManagement: React.FC = () => {
           
           {/* Search Status */}
           {(nameSearchActive || codeSearchActive) && (
-            <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
-              <div className="text-sm font-medium text-amber-800 flex items-center gap-2 justify-between">
-                <span>🔍 Showing {items.length} results 
-                  {nameSearchActive && ' (Name)'}
-                  {codeSearchActive && ' (Code)'}
+            <div className="mt-6 p-2 bg-amber-50 border border-amber-200 rounded-xl">
+              <div className="text-sm font-medium text-amber-700 flex items-center gap-2 justify-between">
+                <span>Showing {items.length} results.
                 </span>
                 <div className="flex gap-2">
-                  {nameSearchActive && (
-                    <button 
-                      onClick={handleClearNameSearch}
-                      className="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-semibold rounded-lg hover:bg-amber-200"
-                    >
-                      Clear Name
-                    </button>
-                  )}
-                  {codeSearchActive && (
-                    <button 
-                      onClick={handleClearCodeSearch}
-                      className="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-semibold rounded-lg hover:bg-amber-200"
-                    >
-                      Clear Code
-                    </button>
-                  )}
                   <button 
                     onClick={handleClearAllSearch}
                     className="px-3 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-lg hover:bg-red-200"
                   >
-                    Clear All
+                    Clear
                   </button>
                 </div>
               </div>
@@ -347,46 +322,42 @@ const ItemsManagement: React.FC = () => {
           )}
         </div>
 
-        {/* ✅ FIXED: Only show list errors when modal is CLOSED */}
+        {/* Only show list errors when modal is CLOSED */}
         {error && !showForm && (
           <div className="bg-red-50/90 border border-red-200 text-red-800 px-6 py-4 rounded-2xl text-sm mb-8 backdrop-blur-sm shadow-sm">
             {error}
           </div>
         )}
 
-        {/* Table Logic - SAME AS BEFORE */}
+        {/* Table Logic */}
         {items.length === 0 && !loading ? (
           (nameSearchActive || codeSearchActive) ? (
             <div className="text-center py-20">
-              <div className="w-24 h-24 mx-auto bg-gradient-to-br from-gray-200 to-gray-300 rounded-3xl flex items-center justify-center mb-6">
-                <span className="text-3xl text-gray-400">🔍</span>
-              </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-2">No items found</h3>
               <p className="text-gray-600 mb-8">Try a different search term</p>
               <button
                 onClick={handleClearAllSearch}
-                className="px-8 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold rounded-2xl hover:shadow-xl hover:from-amber-600 hover:to-amber-700 transition-all duration-300 mx-auto"
+                className="px-6 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all duration-300 mx-auto"
               >
                 Clear Search
               </button>
             </div>
           ) : (
             <div className="text-center py-20">
-              <div className="w-24 h-24 mx-auto bg-gradient-to-br from-gray-200 to-gray-300 rounded-3xl flex items-center justify-center mb-6">
+              <div className="mx-auto bg-gradient-to-br from-gray-200 to-gray-300 rounded-3xl flex items-center justify-center mb-6">
                 <span className="text-3xl text-gray-400">📦</span>
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-2">No items found</h3>
               <p className="text-gray-600 mb-4">Try adjusting your filters or add new items</p>
               <button
                 onClick={handleNewItem}
-                className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold rounded-2xl hover:shadow-xl transition-all"
+                className="px-6 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold rounded-2xl hover:shadow-xl transition-all"
               >
-                ➕ Add First Item
+                Add First Item
               </button>
             </div>
           )
         ) : (
-          // Table with items - SAME AS BEFORE
           <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-lg border border-gray-100 overflow-hidden mb-8">
             <div className="overflow-x-auto">
               <table className="w-full divide-y divide-gray-200">
@@ -410,12 +381,14 @@ const ItemsManagement: React.FC = () => {
                       <td className="px-6 py-6 font-mono font-bold text-sm text-gray-900">{item.code}</td>
                       <td className="px-6 py-6">
                         <div className="flex items-center gap-4">
-                          <img 
-                            src={item.imageUrl} 
-                            alt={item.name} 
-                            className="w-14 h-14 rounded-xl object-cover shadow-md ring-2 ring-gray-200 hover:ring-amber-300 transition-all"
+                          <img
+                            src={getImageSrc(item.imageUrl)}
+                            alt={item.name}
+                            className="w-14 h-14 rounded-xl object-cover shadow-md ring-2 ring-gray-200"
                             onError={(e) => {
-                              (e.target as HTMLImageElement).src = 'https://via.placeholder.com/56x56/f3f4f6/9ca3af?text=No+Image';
+                              const img = e.currentTarget;
+                              if (img.src.includes('placeholder')) return; 
+                              img.src = '/images/placeholder.png';
                             }}
                           />
                           <div className="min-w-0 flex-1">
@@ -498,41 +471,19 @@ const ItemsManagement: React.FC = () => {
         )}
 
         {/* Pagination */}
-        {(nameSearchActive || codeSearchActive || totalPages > 1) && (
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center justify-between">
-            <div className="text-sm text-gray-700">
-              Page {page + 1} of {totalPages}
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                disabled={page === 0}
-                onClick={() => {
-                  setPage(p => Math.max(0, p - 1));
-                  fetchItems(page - 1, categoryFilter || undefined);
-                }}
-                className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-              >
-                Previous
-              </button>
-              <span className="text-sm font-semibold text-gray-700 px-4 py-2 bg-gray-100 rounded-xl">
-                Page {page + 1}
-              </span>
-              <button
-                disabled={page >= totalPages - 1}
-                onClick={() => {
-                  setPage(p => Math.min(totalPages - 1, p + 1));
-                  fetchItems(page + 1, categoryFilter || undefined);
-                }}
-                className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-              >
-                Next
-              </button>
-            </div>
-          </div>
+        {!nameSearchActive && !codeSearchActive && totalPages > 1 && (
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            onChange={(p) => {
+              setPage(p);
+              fetchItems(p, categoryFilter || undefined);
+            }}
+          />
         )}
       </div>
 
-      {/* ✅ PASS MODAL ERROR HANDLERS */}
+      {/* PASS MODAL ERROR HANDLERS */}
       <ItemFormModal
         showForm={showForm}
         editingItem={editingItem}
@@ -541,8 +492,8 @@ const ItemsManagement: React.FC = () => {
         onSubmitSuccess={handleFormSuccess}
         page={page}
         categoryFilter={categoryFilter}
-        modalError={modalError}      // ✅ NEW
-        setModalError={setModalError} // ✅ NEW
+        modalError={modalError}      
+        setModalError={setModalError} 
       />
     </div>
   );

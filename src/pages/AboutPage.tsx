@@ -1,4 +1,3 @@
-// src/pages/AboutPage.tsx
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 

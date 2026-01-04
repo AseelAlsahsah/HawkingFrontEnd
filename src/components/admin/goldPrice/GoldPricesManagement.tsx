@@ -6,6 +6,7 @@ import {
 } from '../../../services/adminApi';
 import GoldPriceFormModal from './GoldPriceFormModal';
 import GoldPriceActions from './GoldPriceActions';
+import Pagination from '../../Pagination';
 
 const GoldPricesManagement: React.FC = () => {
   const navigate = useNavigate();
@@ -18,21 +19,25 @@ const GoldPricesManagement: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingGoldPrice, setEditingGoldPrice] = useState<AdminGoldPrice | null>(null);
 
+  const getErrorMessage = (err: any, fallback = 'Something went wrong') => {
+    return (
+      err.response?.data?.status?.description ||
+      err?.response?.data?.message ||
+      err?.message ||
+      fallback
+    );
+  };
+
   const fetchGoldPrices = useCallback(async (pageNum: number = 0) => {
     setLoading(true);
     setError('');
     try {
-      const data = await adminFetchGoldPrices({ page: pageNum, size: 20 });
+      const data = await adminFetchGoldPrices({ page: pageNum, size: 10 });
       setGoldPrices(data.content || []);
       setPage(data.page?.number || 0);
       setTotalPages(data.page?.totalPages || 0);
     } catch (err: any) {
-      console.error('Fetch gold prices error:', err);
-      const errorMsg = err.response?.data?.status?.description || 
-                      err.response?.data?.message || 
-                      err.message || 
-                      'Failed to load gold prices';
-      setError(errorMsg);
+      setError(getErrorMessage(err, 'Failed to load gold prices'));
       setGoldPrices([]);
     } finally {
       setLoading(false);
@@ -193,31 +198,13 @@ const GoldPricesManagement: React.FC = () => {
           </div>
         )}
 
+        {/* Pagination */}
         {totalPages > 1 && (
-          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center justify-between">
-            <div className="text-sm text-gray-700">
-              Page {page + 1} of {totalPages}
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                disabled={page === 0}
-                onClick={() => fetchGoldPrices(page - 1)}
-                className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-              >
-                Previous
-              </button>
-              <span className="text-sm font-semibold text-gray-700 px-4 py-2 bg-gray-100 rounded-xl">
-                Page {page + 1}
-              </span>
-              <button
-                disabled={page >= totalPages - 1}
-                onClick={() => fetchGoldPrices(page + 1)}
-                className="px-5 py-2.5 text-sm font-semibold text-gray-700 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-              >
-                Next
-              </button>
-            </div>
-          </div>
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            onChange={(p) => fetchGoldPrices(p)}
+          />
         )}
       </div>
 

@@ -1,11 +1,9 @@
-// src/App.js - REPLACE WITH THIS COMPLETE VERSION
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AdminAuthProvider, useAdminAuth } from './contexts/AdminAuthContext';
 import LoginForm from './components/admin/LoginForm';
-import RegisterForm from './components/admin/RegisterForm';  // ← MISSING THIS?
+import RegisterForm from './components/admin/RegisterForm'; 
 
-// AdminDashboard Component
 const AdminDashboard = () => {
   const { logout, user } = useAdminAuth();
   return (
