@@ -10,7 +10,10 @@ export interface Item {
   code: string;
   name: string;
   description: string;
+  arabicName: string;
+  arabicDescription: string;
   categoryName: string;
+  arabicCategoryName: string;
   karatName: string;
   priceAfterDiscount: number | null;
   priceBeforeDiscount: number;
@@ -52,6 +55,8 @@ export interface ItemDetail {
   code: string;
   name: string;
   description: string;
+  arabicName: string;
+  arabicDescription: string;
   imageUrl: string;
   priceBeforeDiscount: number;
   priceAfterDiscount: number | null;
@@ -62,7 +67,7 @@ export interface ItemDetail {
   inStockCount: number;
   reservedCount: number;
   karat: { displayName: string; id: number; name: string };
-  category: { name: string; id: number; description: string };
+  category: { name: string; id: number; description: string; arabicName: string; arabicDescription: string};
 }
 
 export async function fetchItemByCode(code: string): Promise<ItemDetail> {
@@ -123,6 +128,8 @@ export interface AdminCategory {
   id: number;
   name: string;
   description: string;
+  arabicName?: string;
+  arabicDescription?: string;
 }
 
 export interface AdminCategoriesResponse {

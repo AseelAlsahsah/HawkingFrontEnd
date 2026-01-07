@@ -21,7 +21,10 @@ export interface Item {
   code: string;
   name: string;
   description: string;
+  arabicName: string;
+  arabicDescription: string;
   categoryName: string;
+  arabicCategoryName: string;
   karatName: string;
   priceAfterDiscount: number | null;
   priceBeforeDiscount: number;
@@ -49,6 +52,8 @@ export interface AdminItem {
   code: string;
   name: string;
   description: string;
+  arabicName: string;
+  arabicDescription: string;
   weight: number;
   category: { 
     id: number; 
@@ -123,6 +128,8 @@ export interface AdminCategory {
   id: number;
   name: string;
   description: string;
+  arabicName: string;
+  arabicDescription: string;
 }
 
 export interface AdminCategoriesResponse {

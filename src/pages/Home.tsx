@@ -1,8 +1,10 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { Link } from 'react-router-dom'; 
+import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function Home() {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
@@ -24,20 +26,19 @@ export default function Home() {
           <div className="relative h-full max-w-4xl mx-auto flex flex-col items-center justify-center px-4 sm:px-6 text-center text-white mt-4 sm:mt-0">
             <div className="bg-white/15 border border-white/20 rounded-xl px-4 py-8 sm:px-8 sm:py-10 md:px-10 md:py-12 backdrop-blur-sm">
               <p className="tracking-[0.25em] sm:tracking-[0.35em] text-[10px] sm:text-xs uppercase mb-4">
-                Exquisite Jewelry For Every Occasion
+                {t('home.heroTagline')}
               </p>
               <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-semibold mb-4 leading-snug">
-                Discover Timeless Elegance
+                {t('home.heroTitle')}
               </h1>
               <p className="text-xs sm:text-sm md:text-base text-gray-100 mb-6 sm:mb-8">
-                Handpicked rings, necklaces, and bracelets crafted to celebrate
-                life’s most precious moments.
+                {t('home.heroDescription')}
               </p>
-              <Link 
+              <Link
                 to="/collections"
                 className="inline-flex items-center px-6 sm:px-8 py-2.5 sm:py-3 rounded-full bg-gold-500 text-gray-700 text-sm sm:text-base font-semibold tracking-wide hover:bg-gold-600 transition"
               >
-                Explore Now
+                {t('home.heroCta')}
               </Link>
             </div>
           </div>
@@ -48,29 +49,26 @@ export default function Home() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-12 grid gap-8 md:grid-cols-3 text-center">
             <div>
               <h3 className="font-semibold text-gray-900 mb-2 text-base sm:text-lg">
-                Certified Quality
+                {t('home.qualityTitle')}
               </h3>
               <p className="text-sm text-gray-600">
-                Every piece is inspected and certified to ensure the highest
-                standards.
+                {t('home.qualityDescription')}
               </p>
             </div>
             <div>
               <h3 className="font-semibold text-gray-900 mb-2 text-base sm:text-lg">
-                Custom Designs
+                {t('home.customTitle')}
               </h3>
               <p className="text-sm text-gray-600">
-                Work with our designers to create unique jewelry that tells your
-                story.
+                {t('home.customDescription')}
               </p>
             </div>
             <div>
               <h3 className="font-semibold text-gray-900 mb-2 text-base sm:text-lg">
-                Secure Reservations
+                {t('home.reservationTitle')}
               </h3>
               <p className="text-sm text-gray-600">
-                Reserve items directly from the website and pick them up in
-                store.
+                {t('home.reservationDescription')}
               </p>
             </div>
           </div>

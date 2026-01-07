@@ -1,10 +1,10 @@
-// src/pages/ReservationForm.tsx
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useCart } from '../contexts/CartContext';
 import { useToast } from '../contexts/ToastContext';
+import { useTranslation } from 'react-i18next';
 
 interface ReservationItem {
   itemCode: string;
@@ -22,7 +22,8 @@ export default function ReservationForm() {
   const { cart, cartTotal, clearCart } = useCart();
   const { addToast } = useToast();
   const navigate = useNavigate();
-  
+  const { t } = useTranslation();
+
   const [formData, setFormData] = useState({
     username: '',
     phoneNumber: ''
@@ -64,15 +65,15 @@ export default function ReservationForm() {
         const errorBody = errorData.body || {};
         setErrors(errorBody);
         const firstError = Object.values(errorBody).flat()[0] as string;
-        addToast(firstError || 'Please fix the errors above', 'error');
+        addToast(firstError || t('reservation.fixErrors'), 'error');
         return;
       }
 
       clearCart();
-      addToast('Reservation created successfully! Owner will contact you soon.', 'success');
+      addToast(t('reservation.success'), 'success');
       navigate('/collections');
     } catch (error) {
-      setErrors({ general: ['Network error. Please try again.'] });
+      setErrors({ general: [t('reservation.networkError')] });
     } finally {
       setLoading(false);
     }
@@ -85,18 +86,18 @@ export default function ReservationForm() {
         <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="bg-white/80 p-8 rounded-2xl border shadow-xl backdrop-blur-sm">
             <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-gold-600 mb-2">Complete Reservation</h1>
+              <h1 className="text-3xl font-bold text-gold-600 mb-2"> {t('reservation.title')}</h1>
               <p className="text-lg text-gray-600">
-                Fill in your details. We'll contact you for pickup.
+                {t('reservation.subtitle')}
               </p>
             </div>
 
             <div className="mb-6 p-4 bg-gray-100 rounded-xl">
-              <h3 className="font-semibold text-gray-900 mb-3">Order Summary</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">{t('reservation.summary')}</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span>{cart.length} Items</span>
-                  <span className="font-semibold">${cartTotal.toFixed(3)}</span>
+                  <span>{t('cart.itemsCount', { count: cart.length })}</span>
+                  <span dir="ltr" className="font-semibold">${cartTotal.toFixed(3)}</span>
                 </div>
               </div>
             </div>
@@ -110,7 +111,7 @@ export default function ReservationForm() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Name
+                  {t('reservation.fullName')}
                 </label>
                 <input
                   type="text"
@@ -119,22 +120,23 @@ export default function ReservationForm() {
                   onChange={handleChange}
                   required
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gold-500 focus:border-gold-500 transition"
-                  placeholder="Enter your full name"
+                  placeholder={t('reservation.fullNamePlaceholder')}
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone Number
+                  {t('reservation.phone')}
                 </label>
                 <input
+                  dir="ltr"
                   type="tel"
                   name="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={handleChange}
                   required
                   className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-gold-500 focus:border-gold-500 transition"
-                  placeholder="+962 7XX XXX XXXX"
+                  placeholder={t('reservation.phonePlaceholder')}
                 />
               </div>
 
@@ -143,7 +145,10 @@ export default function ReservationForm() {
                 disabled={loading}
                 className="w-full py-3 bg-gold-600 text-white font-semibold text-lg rounded-xl hover:bg-gold-700 focus:outline-none focus:ring-2 focus:ring-gold-500 focus:ring-offset-2 transition-all duration-200 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Creating Reservation...' : `Reserve Order $ ${cartTotal.toFixed(3)}`}
+                {loading
+                  ? t('reservation.creating')
+                  : (<span dir="ltr"> {t('reservation.reserveWithPrice', { price: cartTotal.toFixed(3), })}</span>)
+                }
               </button>
             </form>
 
@@ -152,7 +157,7 @@ export default function ReservationForm() {
                 to="/cart"
                 className="w-full block py-3 px-4 border border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 rounded-xl text-sm font-medium text-gray-700 flex items-center justify-center hover:shadow-sm"
               >
-                ← Back to Cart
+                {t('reservation.backToCart')}
               </Link>
             </div>
           </div>

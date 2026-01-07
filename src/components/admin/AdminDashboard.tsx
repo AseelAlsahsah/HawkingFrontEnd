@@ -3,14 +3,45 @@ import React, { useState } from 'react';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import { Link } from 'react-router-dom';
 
+/* ----------------------------- COLOR MAP ----------------------------- */
+const actionColorClasses: Record<
+  string,
+  { bg: string; text: string }
+> = {
+  amber: {
+    bg: 'bg-amber-100',
+    text: 'text-amber-700',
+  },
+  yellow: {
+    bg: 'bg-yellow-100',
+    text: 'text-yellow-700',
+  },
+  indigo: {
+    bg: 'bg-indigo-100',
+    text: 'text-indigo-700',
+  },
+  emerald: {
+    bg: 'bg-emerald-100',
+    text: 'text-emerald-700',
+  },
+  purple: {
+    bg: 'bg-purple-100',
+    text: 'text-purple-700',
+  },
+  rose: {
+    bg: 'bg-rose-100',
+    text: 'text-rose-700',
+  },
+};
+
 const AdminDashboard: React.FC = () => {
   const { logout, user } = useAdminAuth();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const quickActions = [
     { label: 'Items', path: '/admin/items', color: 'amber' },
-    { label: 'Karats', path: '/admin/karats', color: 'yellow' },
-    { label: 'Categories', path: '/admin/categories', color: 'indigo' },
+    { label: 'Karats', path: '/admin/karats', color: 'indigo' },
+    { label: 'Categories', path: '/admin/categories', color: 'yellow' },
     { label: 'Gold Prices', path: '/admin/gold-prices', color: 'emerald' },
     { label: 'Reservations', path: '/admin/reservations', color: 'purple' },
     { label: 'Discounts', path: '/admin/discounts', color: 'rose' },
@@ -27,9 +58,14 @@ const AdminDashboard: React.FC = () => {
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Admin Dashboard
+            </h1>
             <p className="text-sm text-gray-500 mt-1">
-              Welcome, <span className="font-semibold text-amber-600">{user?.username}</span>
+              Welcome,{' '}
+              <span className="font-semibold text-amber-600">
+                {user?.username}
+              </span>
             </p>
           </div>
 
@@ -46,7 +82,9 @@ const AdminDashboard: React.FC = () => {
       <main className="max-w-7xl mx-auto px-6 py-10">
         {/* Section title */}
         <div className="mb-8">
-          <h2 className="text-xl font-bold text-gray-900">Management</h2>
+          <h2 className="text-xl font-bold text-gray-900">
+            Management
+          </h2>
           <p className="text-sm text-gray-500">
             Access and manage system resources
           </p>
@@ -54,27 +92,31 @@ const AdminDashboard: React.FC = () => {
 
         {/* Quick actions grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {quickActions.map(action => (
-            <Link
-              key={action.path}
-              to={action.path}
-              className="group bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-gray-900">
-                  {action.label}
-                </h3>
-                <span
-                  className={`inline-flex items-center justify-center w-10 h-10 rounded-lg bg-${action.color}-100 text-${action.color}-700 font-bold`}
-                >
-                  →
-                </span>
-              </div>
-              <p className="text-sm text-gray-500">
-                Manage {action.label.toLowerCase()} settings and data
-              </p>
-            </Link>
-          ))}
+          {quickActions.map(action => {
+            const colors = actionColorClasses[action.color];
+
+            return (
+              <Link
+                key={action.path}
+                to={action.path}
+                className="group bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-gray-900">
+                    {action.label}
+                  </h3>
+                  <span
+                    className={`inline-flex items-center justify-center w-10 h-10 rounded-lg font-bold ${colors.bg} ${colors.text}`}
+                  >
+                    →
+                  </span>
+                </div>
+                <p className="text-sm text-gray-500">
+                  Manage {action.label.toLowerCase()} settings and data
+                </p>
+              </Link>
+            );
+          })}
         </div>
       </main>
 

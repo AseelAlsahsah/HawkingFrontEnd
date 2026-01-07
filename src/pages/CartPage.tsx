@@ -2,8 +2,10 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { useCart } from '../contexts/CartContext';
+import { useTranslation } from 'react-i18next';
 
 export default function CartPage() {
+  const { t } = useTranslation();
   const { cart, updateQuantity, removeItem, cartTotal, cartCount, clearCart } = useCart();
 
   if (cart.length === 0) {
@@ -13,12 +15,12 @@ export default function CartPage() {
         <main className="flex-1 pt-16 flex items-center justify-center">
           <div className="text-center p-12 max-w-md">
             <div className="text-6xl mb-6">🛒</div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Your cart is empty</h2>
-            <Link 
-              to="/collections" 
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('cart.empty')}</h2>
+            <Link
+              to="/collections"
               className="inline-flex items-center px-8 py-3 bg-gold-600 text-white font-semibold rounded-xl hover:bg-gold-700 transition text-lg"
             >
-              Start Shopping
+              {t('cart.startShopping')}
             </Link>
           </div>
         </main>
@@ -35,21 +37,26 @@ export default function CartPage() {
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
             {/* Cart Items */}
             <div className="lg:w-2/3">
-              <h1 className="text-3xl font-bold text-gray-900 mb-6">Your Cart</h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-6">{t('cart.title')}</h1>
               <div className="space-y-4">
                 {cart.map((item) => (
                   <div key={item.id} className="bg-white/80 p-6 rounded-2xl border shadow-sm flex gap-4">
-                    <img 
-                      src={item.imageUrl} 
+                    <img
+                      src={item.imageUrl}
                       alt={item.name}
                       className="w-20 h-20 object-cover rounded-xl"
                     />
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-gray-900 text-lg mb-1">{item.name}</h3>
-                      <p className="text-sm text-gray-600 mb-4">Code: <span className="font-mono">{item.code}</span></p>
+                      <span className="text-sm text-gray-600 mb-4">
+                        {t('cart.code')}:{' '}
+                        <span dir="ltr" className="font-mono">
+                          {item.code}
+                        </span>
+                      </span>
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3 min-w-0 flex-1">
-                          <span className="text-lg sm:text-xl font-bold text-gold-600 truncate">
+                          <span dir="ltr" className="text-lg sm:text-xl font-bold text-gold-600 truncate">
                             ${item.price.toFixed(3)}
                           </span>
                           <div className="flex items-center gap-1 flex-shrink-0">
@@ -72,7 +79,7 @@ export default function CartPage() {
                           onClick={() => removeItem(item.id)}
                           className="text-red-500 hover:text-red-700 font-medium text-sm px-2 py-1 whitespace-nowrap flex-shrink-0 ml-2"
                         >
-                          Remove
+                          {t('cart.remove')}
                         </button>
                       </div>
                     </div>
@@ -84,11 +91,15 @@ export default function CartPage() {
             {/* Order Summary */}
             <div className="lg:w-1/3">
               <div className="bg-white/80 p-6 rounded-2xl border shadow-sm sticky top-8">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">Order Summary</h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-6">{t('cart.summary')}</h2>
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between text-sm">
-                    <span>{cartCount} Items</span>
-                    <span>${cartTotal.toFixed(3)}</span>
+                    <span>
+                      {t('cart.itemsCount', { count: cartCount })}
+                    </span>
+                    <span dir="ltr">
+                      ${cartTotal.toFixed(3)}
+                    </span>
                   </div>
                 </div>
                 <Link
@@ -98,13 +109,13 @@ export default function CartPage() {
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
-                  Continue Shopping
+                  {t('cart.continueShopping')}
                 </Link>
                 <Link
                   to="/reservation"
                   className="w-full block py-3 px-6 bg-gold-600 text-white font-semibold rounded-xl hover:bg-gold-700 transition text-lg mb-4 justify-center flex items-center"
                 >
-                  Proceed to Reservation
+                  {t('cart.proceed')}
                 </Link>
                 <button
                   onClick={() => clearCart()}
@@ -113,7 +124,7 @@ export default function CartPage() {
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
-                  Clear {cartCount} items
+                  {t('cart.clear', { count: cartCount })}
                 </button>
               </div>
             </div>

@@ -4,13 +4,8 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useCart } from '../contexts/CartContext';
 import type { Item } from "../services/api";
 import { searchItems } from "../services/api";  
-
-const navLinks = [
-  { label: "Home", path: "/" },
-  { label: "Collections", path: "/collections" },
-  { label: "About", path: "/about" },
-  { label: "Get in Touch", path: "/contact" },
-];
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from './LanguageSwitcher';
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -22,6 +17,14 @@ export default function Navbar() {
   const location = useLocation();
   const { cartCount } = useCart();
   const searchRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
+
+  const navLinks = [
+    { label: t('navbar.home'), path: '/' },
+    { label: t('navbar.collections'), path: '/collections' },
+    { label: t('navbar.about'), path: '/about' },
+    { label: t('navbar.contact'), path: '/contact' },
+  ];
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -78,11 +81,11 @@ export default function Navbar() {
           to="/" 
           className="text-xl sm:text-2xl font-semibold tracking-wide text-gray-900"
         >
-          Hawking
+          {t('navbar.logo')}
         </Link>
 
         {/* Desktop links */}
-        <ul className="hidden md:flex items-center space-x-8 text-sm font-medium text-gray-700">
+        <ul className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-700">
           {navLinks.map((link) => {
             const isActive = location.pathname === link.path;
             return (
@@ -102,7 +105,7 @@ export default function Navbar() {
         </ul>
 
         {/* Search + Icons */}
-        <div className="flex items-center space-x-2 sm:space-x-4" ref={searchRef}>
+        <div className="flex items-center gap-2 sm:gap-4" ref={searchRef}>          
           {/* Search */}
           <div className="relative flex-1 md:w-64 max-w-md">
             <form onSubmit={handleSearchSubmit} className="flex">
@@ -112,7 +115,7 @@ export default function Navbar() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onFocus={() => searchQuery.length >= 2 && setShowSearchDropdown(true)}
-                  placeholder="Search items..."
+                  placeholder={t('navbar.searchPlaceholder')}
                   className="w-full pl-10 pr-10 py-2 border border-gray-200 rounded-full focus:border-gold-300 focus:ring-1 focus:ring-gold-300 focus:outline-none transition-all duration-300 bg-white/50 text-sm"
                 />
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -164,11 +167,14 @@ export default function Navbar() {
             {showSearchDropdown && searchResults.length === 0 && !loading && searchQuery.length >= 2 && (
               <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-50">
                 <div className="p-4 text-center text-gray-500 text-sm">
-                  No items found
+                  {t('navbar.noItems')}
                 </div>
               </div>
             )}
           </div>
+
+          {/* Language switcher */}
+          <LanguageSwitcher />
 
           {/* Cart */}
           <Link to="/cart" className="p-2 rounded-full hover:bg-gray-100 relative">

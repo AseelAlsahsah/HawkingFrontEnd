@@ -5,7 +5,9 @@ import { useToast } from '../../../contexts/ToastContext';
 
 interface CategoryFormData {
   name: string;
+  arabicName: string;
   description: string;
+  arabicDescription: string;
 }
 
 interface CategoryFormModalProps {
@@ -25,7 +27,9 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
 }) => {
   const [formData, setFormData] = useState<CategoryFormData>({
     name: '',
-    description: ''
+    arabicName: '',
+    description: '',
+    arabicDescription: '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -35,10 +39,12 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
     if (editingCategory) {
       setFormData({
         name: editingCategory.name,
-        description: editingCategory.description
+        arabicName: editingCategory.arabicName || '',
+        description: editingCategory.description,
+        arabicDescription: editingCategory.arabicDescription || '',
       });
     } else {
-      setFormData({ name: '', description: '' });
+      setFormData({ name: '', description: '', arabicName: '', arabicDescription: '' });
     }
     setError('');
   }, [editingCategory, showForm]);
@@ -63,7 +69,9 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
       setError('');
       const payload = {
         name: formData.name.trim(),
-        description: formData.description.trim()
+        arabicName: formData.arabicName.trim() || undefined,
+        description: formData.description.trim(),
+        arabicDescription: formData.arabicDescription.trim() || undefined
       };
       if (editingCategory) {
         await adminUpdateCategory(editingCategory.id, payload);
@@ -120,6 +128,22 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Category Name (Arabic) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  value={formData.arabicName}
+                  onChange={(e) =>
+                    setFormData({ ...formData, arabicName: e.target.value })
+                  }
+                  disabled={loading}
+                  dir="rtl"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm"
+                  placeholder="اسم الفئة"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Description <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -127,6 +151,23 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   disabled={loading}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Description (Arabic) <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={formData.arabicDescription}
+                  onChange={(e) =>
+                    setFormData({ ...formData, arabicDescription: e.target.value })
+                  }
+                  disabled={loading}
+                  dir="rtl"
+                  rows={2}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 bg-white shadow-sm resize-vertical"
+                  placeholder="الوصف بالعربية"
                   required
                 />
               </div>

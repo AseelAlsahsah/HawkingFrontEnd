@@ -104,6 +104,8 @@ const ItemsManagement: React.FC = () => {
       code: item.code,
       name: item.name,
       description: item.description || '',
+      arabicName: item.arabicName,
+      arabicDescription: item.arabicDescription || '',
       weight: item.weight,
       category: { 
         id: 0, 
@@ -443,8 +445,8 @@ const ItemsManagement: React.FC = () => {
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-6 text-center">
-                        <span className={`inline-flex px-3 py-1 text-sm font-bold rounded-full shadow-sm border-2 ${
+                      <td className="px-6 py-3 text-center">
+                        <span className={`inline-flex px-3 py-1 text-xs font-bold rounded-full shadow-sm border-2 ${
                           item.isActive 
                             ? 'bg-emerald-100 border-emerald-300 text-emerald-800' 
                             : 'bg-gray-100 border-gray-300 text-gray-700'

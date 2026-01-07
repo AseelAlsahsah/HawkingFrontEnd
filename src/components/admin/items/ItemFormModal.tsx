@@ -3,12 +3,14 @@ import type { AdminCategory, AdminKarat } from '../../../services/api';
 import type { AdminItem } from '../../../services/adminApi';
 import { adminFetchKarats } from '../../../services/api';
 import { adminCreateItem, adminUpdateItem } from '../../../services/adminApi';
-import { useToast } from '../../../contexts/ToastContext'; 
+import { useToast } from '../../../contexts/ToastContext';
 
 interface ItemFormData {
   code: string;
   name: string;
+  arabicName: string;
   description: string;
+  arabicDescription: string;
   weight: number | '';
   categoryName: string;
   karatName: string;
@@ -45,7 +47,9 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
   const [formData, setFormData] = useState<ItemFormData>({
     code: '',
     name: '',
+    arabicName: '',
     description: '',
+    arabicDescription: '',
     weight: '',
     categoryName: '',
     karatName: '',
@@ -81,7 +85,9 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
       setFormData({
         code: editingItem.code,
         name: editingItem.name,
+        arabicName: editingItem.arabicName || '',
         description: editingItem.description || '',
+        arabicDescription: editingItem.arabicDescription || '',
         weight: editingItem.weight,
         categoryName: editingItem.category.name,
         karatName: editingItem.karat.name,
@@ -93,8 +99,8 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
       });
     } else {
       setFormData({
-        code: '', name: '', description: '', weight: '', categoryName: '',
-        karatName: '', factoryPrice: '', imageUrl: '', inStockCount: '', 
+        code: '', name: '', description: '', arabicName: '', arabicDescription: '', weight: '', categoryName: '',
+        karatName: '', factoryPrice: '', imageUrl: '', inStockCount: '',
         reservedCount: '', isActive: true
       });
     }
@@ -103,12 +109,13 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitLoading(true);
-    setModalError(''); 
+    setModalError('');
 
     try {
       // VALIDATION CHECKS
       if (!formData.code.trim()) throw new Error('Item code is required');
       if (!formData.name.trim()) throw new Error('Item name is required');
+      if (!formData.arabicName.trim()) throw new Error('Arabic item name is required');
       if (!formData.categoryName) throw new Error('Please select a category');
       if (!formData.karatName) throw new Error('Please select a karat');
       if (!formData.imageUrl.trim()) throw new Error('Image URL is required');
@@ -144,7 +151,7 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
         err.response?.data?.message ||
         err.message ||
         'Failed to save item';
-      setModalError(errorMsg); 
+      setModalError(errorMsg);
     } finally {
       setSubmitLoading(false);
     }
@@ -152,166 +159,196 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
 
   if (!showForm) return null;
 
-return (
-  <>
-    <div className="fixed inset-0 bg-black/10 backdrop-blur-sm z-50 animate-in fade-in duration-200" />
-    {/* Modal */}
-    <div className="fixed inset-0 flex items-center justify-center z-50 p-4 animate-in fade-in zoom-in duration-200">
-      <div className="bg-white/95 rounded-xl shadow-2xl max-w-4xl w-full border border-gray-200 animate-in slide-in-from-bottom-4 duration-300 max-h-[95vh] overflow-y-auto">
-        <div className="p-6 pb-4">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">
-              {editingItem ? `Edit ${editingItem.name}` : 'New Item'}
-            </h2>
-            <button
-              onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
-            >
-              <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-          {/* Error */}
-          {modalError && (
-            <div className="p-3 mb-5 bg-red-50 border border-red-200 rounded-xl">
-              <p className="text-sm font-semibold text-red-800">
-                {modalError}
-              </p>
-            </div>
-          )}
-          {/* Form – GRID KEPT */}
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Item Code *</label>
-              <input
-                value={formData.code}
-                onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md"
-                placeholder='Item Code'
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Category *</label>
-              <select
-                value={formData.categoryName}
-                onChange={(e) => setFormData({ ...formData, categoryName: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md"
-                required
+  return (
+    <>
+      <div className="fixed inset-0 bg-black/10 backdrop-blur-sm z-50 animate-in fade-in duration-200" />
+      {/* Modal */}
+      <div className="fixed inset-0 flex items-center justify-center z-50 p-4 animate-in fade-in zoom-in duration-200">
+        <div className="bg-white/95 rounded-xl shadow-2xl max-w-4xl w-full border border-gray-200 animate-in slide-in-from-bottom-4 duration-300 max-h-[95vh] overflow-y-auto">
+          <div className="p-6 pb-4">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">
+                {editingItem ? `Edit ${editingItem.name}` : 'New Item'}
+              </h2>
+              <button
+                onClick={onClose}
+                className="p-2 hover:bg-gray-100 rounded-xl transition-colors"
               >
-                <option value="">Select Category</option>
-                {categories.map(c => (
-                  <option key={c.id} value={c.name}>{c.name}</option>
-                ))}
-              </select>
+                <svg className="w-5 h-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Item Name *</label>
-              <input
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md"
-                placeholder='Item Name'
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Karat *</label>
-              <select
-                value={formData.karatName}
-                onChange={(e) => setFormData({ ...formData, karatName: e.target.value })}
-                disabled={karatsLoading}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md disabled:opacity-50"
-                required
-              >
-                <option value="">Select Karat</option>
-                {karats.map(k => (
-                  <option key={k.id} value={k.name}>{k.displayName}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-3">Weight (grams) *</label>
-              <input 
-                required 
-                type="number" step="0.01"
-                value={formData.weight} 
-                placeholder='Item Weight (g)'
-                onChange={(e) => setFormData({...formData, weight: e.target.value === '' ? '' : Number(e.target.value),})}
-                className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-400/50 focus:border-blue-400 text-s shadow-sm transition-all duration-300"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-3">Factory Price ($/gram) *</label>
-              <input 
-                required 
-                type="number" step="0.01" 
-                value={formData.factoryPrice}
-                placeholder='Item Factory price per (g)' 
-                onChange={(e) => setFormData({...formData, factoryPrice: e.target.value === '' ? '' : Number(e.target.value),})}
-                className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-400/50 focus:border-blue-400 text-s shadow-sm transition-all duration-300"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-3">Stock Count *</label>
-              <input 
-                required 
-                type="number" 
-                value={formData.inStockCount} 
-                placeholder='In Stock Count'
-                onChange={(e) => setFormData({...formData, inStockCount: e.target.value === '' ? '' : Number(e.target.value),})}
-                className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-400/50 focus:border-emerald-400 text-s shadow-sm transition-all duration-300"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-3">Reserved Count</label>
-              <input 
-                type="number" 
-                value={formData.reservedCount} 
-                placeholder='Reserved Items Count'
-                onChange={(e) => setFormData({...formData, reservedCount: e.target.value === '' ? '' : Number(e.target.value),})}
-                className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-orange-400/50 focus:border-orange-400 text-s shadow-sm transition-all duration-300"
-              />
-            </div>
-            <div className="lg:col-span-2">
-              <label className="block text-sm font-bold text-gray-700 mb-3">Image URL *</label>
-              <input 
-                required 
-                value={formData.imageUrl} 
-                onChange={(e) => setFormData({...formData, imageUrl: e.target.value})}
-                className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-400/50 focus:border-purple-400 text-s shadow-sm transition-all duration-300"
-                placeholder="https://drive.google.com/..." 
-              />
-              <p className="text-xs text-gray-500 mt-2">Use Google Drive URLs</p>
-            </div>
-            <div className="lg:col-span-2">
-              <label className="block text-sm font-bold text-gray-700 mb-3">Description</label>
-              <textarea 
-                value={formData.description} 
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
-                rows={3}
-                className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-400/50 focus:border-purple-400 text-s shadow-sm transition-all duration-300 resize-vertical"
-                placeholder="Optional: Add item description..."
-              />
-            </div>
-            <div className="lg:col-span-2">
-              <label className="block text-sm font-bold text-gray-700 mb-3">Status</label>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input 
-                  type="checkbox" 
-                  checked={formData.isActive}
-                  onChange={(e) => setFormData({...formData, isActive: e.target.checked})}
-                  className="sr-only peer"
+            {/* Error */}
+            {modalError && (
+              <div className="p-3 mb-5 bg-red-50 border border-red-200 rounded-xl">
+                <p className="text-sm font-semibold text-red-800">
+                  {modalError}
+                </p>
+              </div>
+            )}
+            {/* Form – GRID KEPT */}
+            <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Item Code *</label>
+                <input
+                  value={formData.code}
+                  onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md"
+                  placeholder='Item Code'
+                  required
                 />
-                <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-600"></div>
-                <span className="ml-3 text-sm font-medium text-gray-900">
-                  {formData.isActive ? 'Active' : 'Inactive'}
-                </span>
-              </label>
-            </div>
-            {/* Actions */}
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Category *</label>
+                <select
+                  value={formData.categoryName}
+                  onChange={(e) => setFormData({ ...formData, categoryName: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md"
+                  required
+                >
+                  <option value="">Select Category</option>
+                  {categories.map(c => (
+                    <option key={c.id} value={c.name}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Item Name *</label>
+                <input
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md"
+                  placeholder='Item Name'
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Item Name (Arabic) *
+                </label>
+                <input
+                  value={formData.arabicName}
+                  onChange={(e) =>
+                    setFormData({ ...formData, arabicName: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white shadow-sm"
+                  placeholder="اسم القطعة"
+                  required
+                  dir="rtl"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Karat *</label>
+                <select
+                  value={formData.karatName}
+                  onChange={(e) => setFormData({ ...formData, karatName: e.target.value })}
+                  disabled={karatsLoading}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md disabled:opacity-50"
+                  required
+                >
+                  <option value="">Select Karat</option>
+                  {karats.map(k => (
+                    <option key={k.id} value={k.name}>{k.displayName}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-3">Weight (grams) *</label>
+                <input
+                  required
+                  type="number" step="0.01"
+                  value={formData.weight}
+                  placeholder='Item Weight (g)'
+                  onChange={(e) => setFormData({ ...formData, weight: e.target.value === '' ? '' : Number(e.target.value), })}
+                  className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-400/50 focus:border-blue-400 text-s shadow-sm transition-all duration-300"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-3">Factory Price ($/gram) *</label>
+                <input
+                  required
+                  type="number" step="0.01"
+                  value={formData.factoryPrice}
+                  placeholder='Item Factory price per (g)'
+                  onChange={(e) => setFormData({ ...formData, factoryPrice: e.target.value === '' ? '' : Number(e.target.value), })}
+                  className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-400/50 focus:border-blue-400 text-s shadow-sm transition-all duration-300"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-3">Stock Count *</label>
+                <input
+                  required
+                  type="number"
+                  value={formData.inStockCount}
+                  placeholder='In Stock Count'
+                  onChange={(e) => setFormData({ ...formData, inStockCount: e.target.value === '' ? '' : Number(e.target.value), })}
+                  className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-400/50 focus:border-emerald-400 text-s shadow-sm transition-all duration-300"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-3">Reserved Count</label>
+                <input
+                  type="number"
+                  value={formData.reservedCount}
+                  placeholder='Reserved Items Count'
+                  onChange={(e) => setFormData({ ...formData, reservedCount: e.target.value === '' ? '' : Number(e.target.value), })}
+                  className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-orange-400/50 focus:border-orange-400 text-s shadow-sm transition-all duration-300"
+                />
+              </div>
+              <div className="lg:col-span-2">
+                <label className="block text-sm font-bold text-gray-700 mb-3">Image URL *</label>
+                <input
+                  required
+                  value={formData.imageUrl}
+                  onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                  className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-400/50 focus:border-purple-400 text-s shadow-sm transition-all duration-300"
+                  placeholder="https://drive.google.com/..."
+                />
+                <p className="text-xs text-gray-500 mt-2">Use Google Drive URLs</p>
+              </div>
+              <div className="lg:col-span-2">
+                <label className="block text-sm font-bold text-gray-700 mb-3">Description</label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  rows={3}
+                  className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-400/50 focus:border-purple-400 text-s shadow-sm transition-all duration-300 resize-vertical"
+                  placeholder="Optional: Add item description..."
+                />
+              </div>
+              <div className="lg:col-span-2">
+                <label className="block text-sm font-bold text-gray-700 mb-3">
+                  Description (Arabic)
+                </label>
+                <textarea
+                  value={formData.arabicDescription}
+                  onChange={(e) =>
+                    setFormData({ ...formData, arabicDescription: e.target.value })
+                  }
+                  rows={3}
+                  dir="rtl"
+                  className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-400/50 focus:border-purple-400 shadow-sm resize-vertical"
+                  placeholder="اختياري: الوصف بالعربية..."
+                />
+              </div>
+              <div className="lg:col-span-2">
+                <label className="block text-sm font-bold text-gray-700 mb-3">Status</label>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.isActive}
+                    onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                    className="sr-only peer"
+                  />
+                  <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-600"></div>
+                  <span className="ml-3 text-sm font-medium text-gray-900">
+                    {formData.isActive ? 'Active' : 'Inactive'}
+                  </span>
+                </label>
+              </div>
+              {/* Actions */}
               <div className="lg:col-span-2 flex gap-3 pt-2">
                 <button
                   type="submit"
