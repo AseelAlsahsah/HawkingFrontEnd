@@ -41,6 +41,15 @@ const RegisterForm: React.FC = () => {
     );
   }
 
+  const getErrorMessage = (err: any, fallback = 'Something went wrong') => {
+    return (
+      err?.response?.data?.message ||
+      err.response?.data?.status?.description ||
+      err?.message ||
+      fallback
+    );
+  };
+  
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -62,8 +71,8 @@ const RegisterForm: React.FC = () => {
       } else {
         setError(result.message || result.error || t('admin.registerFailed'));
       }
-    } catch {
-      setError(t('admin.registerFailed'));
+    } catch (err: any) {
+      setError(getErrorMessage(err, t('admin.registerFailed')));
     } finally {
       setLoading(false);
     }

@@ -35,6 +35,15 @@ const LoginForm: React.FC = () => {
     );
   }
 
+  const getErrorMessage = (err: any, fallback = 'Something went wrong') => {
+    return (
+      err?.response?.data?.message ||
+      err.response?.data?.status?.description ||
+      err?.message ||
+      fallback
+    );
+  };
+  
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -47,8 +56,8 @@ const LoginForm: React.FC = () => {
       } else {
         setError(result.error || t('admin.invalidCredentials'));
       }
-    } catch {
-      setError(t('admin.loginFailed'));
+    } catch (err: any) {
+      setError(getErrorMessage(err, t('admin.registerFailed')));
     } finally {
       setLoading(false);
     }
