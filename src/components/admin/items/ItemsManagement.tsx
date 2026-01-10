@@ -316,7 +316,7 @@ const ItemsManagement: React.FC = () => {
           {(nameSearchActive || codeSearchActive) && (
             <div className="mt-6 p-2 bg-amber-50 border border-amber-200 rounded-xl">
               <div className="text-sm font-medium text-amber-700 flex items-center gap-2 justify-between">
-                <span>{t('admin.items.showingResults', { count: items.length })}
+                <span>{t('admin.items.showingResults')}
                 </span>
                 <div className="flex gap-2">
                   <button

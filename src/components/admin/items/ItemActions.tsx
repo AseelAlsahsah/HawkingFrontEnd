@@ -1,6 +1,6 @@
 import React from 'react';
 import type { AdminItem } from '../../../services/adminApi';
-import { adminDeactivateItem, adminDeleteItem  } from '../../../services/adminApi';
+import { adminDeactivateItem, adminDeleteItem } from '../../../services/adminApi';
 import { useTranslation } from 'react-i18next';
 
 interface ItemActionsProps {
@@ -12,13 +12,13 @@ interface ItemActionsProps {
   setError: (error: string) => void;
 }
 
-const ItemActions: React.FC<ItemActionsProps> = ({ 
-  item, 
-  onEdit, 
-  fetchItems, 
-  page, 
-  categoryFilter, 
-  setError 
+const ItemActions: React.FC<ItemActionsProps> = ({
+  item,
+  onEdit,
+  fetchItems,
+  page,
+  categoryFilter,
+  setError
 }) => {
   const [deactivating, setDeactivating] = React.useState(false);
   const [deleting, setDeleting] = React.useState(false);
@@ -38,7 +38,7 @@ const ItemActions: React.FC<ItemActionsProps> = ({
   const handleDeactivate = async () => {
     try {
       setDeactivating(true);
-      await adminDeactivateItem(item.code!); 
+      await adminDeactivateItem(item.code!);
       await fetchItems(page, categoryFilter);
     } catch (err: any) {
       setError(getErrorMessage(err, 'Failed to deactivate'));
@@ -147,12 +147,11 @@ const ItemActions: React.FC<ItemActionsProps> = ({
 
               {/* Title */}
               <h3 className="text-lg font-black text-gray-900 mb-3">
-                Delete Item ({item.code})?
+                {t('admin.items.actions.confirmTitle', { code: item.code })}
               </h3>
 
               <p className="text-sm text-gray-500 mb-8 leading-relaxed">
-                This action <span className="font-bold text-red-600">CANNOT</span> be undone.
-                The item will be permanently removed from your inventory.
+                {t('admin.items.actions.confirmText')}
               </p>
 
               {/* Buttons */}
@@ -161,14 +160,14 @@ const ItemActions: React.FC<ItemActionsProps> = ({
                   onClick={confirmDelete}
                   className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-xl text-lg border border-red-600/50"
                 >
-                  Delete
+                  {t('admin.items.actions.confirmDelete')}
                 </button>
 
                 <button
                   onClick={cancelDelete}
                   className="flex-1 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-900 font-bold py-2 px-4 rounded-xl text-lg border border-gray-300"
                 >
-                  Cancel
+                  {t('admin.items.actions.cancel')}
                 </button>
               </div>
             </div>

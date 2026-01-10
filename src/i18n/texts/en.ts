@@ -209,7 +209,8 @@ const en = {
             addNew: 'Add New Item',
             addFirst: 'Add First Item',
 
-            showingResults: 'Showing {{count}} results',
+            showingResults: 'Showing possible results',
+            clearSearch: 'Clear Search',
 
             table: {
                 code: 'Code',
@@ -230,7 +231,81 @@ const en = {
                 inactive: 'Inactive',
             },
 
-            clearSearch: 'Clear Search',
+            actions: {
+                deleteSuccess: '"{{code}}" deleted successfully.',
+                deleteFailed: 'Failed to delete item',
+                confirmTitle: 'Delete Item ({{code}})?',
+                confirmText:
+                    'This action CANNOT be undone. It will be permanently removed from your system.',
+                confirmDelete: 'Delete',
+                cancel: 'Cancel',
+            },
+
+            modal: {
+                newTitle: 'New Item',
+                editTitle: 'Edit {{name}}',
+
+                validation: {
+                    codeRequired: 'Item code is required',
+                    nameRequired: 'Item name is required',
+                    arabicNameRequired: 'Arabic item name is required',
+                    categoryRequired: 'Please select a category',
+                    karatRequired: 'Please select a karat',
+                    imageRequired: 'Image URL is required',
+                    weightRequired: 'Weight is required',
+                    factoryPriceRequired: 'Factory price is required',
+                    stockRequired: 'Stock count is required',
+                    invalidId: 'Invalid item ID. Please try again.',
+                    saveFailed: 'Failed to save item',
+                },
+
+                fields: {
+                    code: 'Item Code',
+                    category: 'Category',
+                    name: 'Item Name',
+                    arabicName: 'Item Name (Arabic)',
+                    karat: 'Karat',
+                    weight: 'Weight (grams)',
+                    factoryPrice: 'Factory Price ($/gram)',
+                    stock: 'Stock Count',
+                    reserved: 'Reserved Count',
+                    imageUrl: 'Image URL',
+                    description: 'Description',
+                    arabicDescription: 'Description (Arabic)',
+                    status: 'Status',
+                },
+
+                placeholders: {
+                    code: 'Item Code',
+                    name: 'Item Name',
+                    arabicName: 'اسم القطعة',
+                    category: 'Select Category',
+                    karat: 'Select Karat',
+                    weight: 'Item Weight (g)',
+                    factoryPrice: 'Item Factory price per (g)',
+                    stock: 'In Stock Count',
+                    reserved: 'Reserved Items Count',
+                    imageUrl: 'https://drive.google.com/...',
+                    description: 'Optional: Add item description...',
+                    arabicDescription: 'اختياري: الوصف بالعربية...',
+                },
+
+                status: {
+                    active: 'Active',
+                    inactive: 'Inactive',
+                },
+
+                actions: {
+                    create: 'Create Item',
+                    update: 'Update Item',
+                    cancel: 'Cancel',
+                    saving: 'Saving…',
+                },
+
+                hint: {
+                    drive: 'Use Google Drive URLs',
+                },
+            },
         },
 
         karats: {
@@ -466,7 +541,7 @@ const en = {
             form: {
                 newTitle: 'New Discount',
                 editTitle: 'Edit Discount',
-                percentage: 'Discount Percentage',
+                percentage: 'Discount Percentage %',
                 percentagePlaceholder: 'Discount %',
                 startDate: 'Start Date',
                 endDate: 'End Date',

@@ -4,6 +4,8 @@ import type { AdminItem } from '../../../services/adminApi';
 import { adminFetchKarats } from '../../../services/api';
 import { adminCreateItem, adminUpdateItem } from '../../../services/adminApi';
 import { useToast } from '../../../contexts/ToastContext';
+import { useTranslation } from 'react-i18next';
+import { pickLang } from '../../../utils/i18nHelpers';
 
 interface ItemFormData {
   code: string;
@@ -63,6 +65,7 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
   const [karatsLoading, setKaratsLoading] = useState(true);
   const [submitLoading, setSubmitLoading] = useState(false);
   const { addToast } = useToast();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const fetchKarats = async () => {
@@ -113,18 +116,18 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
 
     try {
       // VALIDATION CHECKS
-      if (!formData.code.trim()) throw new Error('Item code is required');
-      if (!formData.name.trim()) throw new Error('Item name is required');
-      if (!formData.arabicName.trim()) throw new Error('Arabic item name is required');
-      if (!formData.categoryName) throw new Error('Please select a category');
-      if (!formData.karatName) throw new Error('Please select a karat');
-      if (!formData.imageUrl.trim()) throw new Error('Image URL is required');
-      if (formData.weight === '') throw new Error('Weight is required');
-      if (formData.factoryPrice === '') throw new Error('Factory price is required');
-      if (formData.inStockCount === '') throw new Error('Stock count is required');
+      if (!formData.code.trim()) throw new Error(t('admin.items.modal.validation.codeRequired'));
+      if (!formData.name.trim()) throw new Error(t('admin.items.modal.validation.nameRequired'));
+      if (!formData.arabicName.trim()) throw new Error(t('admin.items.modal.validation.arabicNameRequired'));
+      if (!formData.categoryName) throw new Error(t('admin.items.modal.validation.categoryRequired'));
+      if (!formData.karatName) throw new Error(t('admin.items.modal.validation.karatRequired'));
+      if (!formData.imageUrl.trim()) throw new Error(t('admin.items.modal.validation.imageRequired'));
+      if (formData.weight === '') throw new Error(t('admin.items.modal.validation.weightRequired'));
+      if (formData.factoryPrice === '') throw new Error(t('admin.items.modal.validation.factoryPriceRequired'));
+      if (formData.inStockCount === '') throw new Error(t('admin.items.modal.validation.stockRequired'));
 
       if (editingItem && (!editingItem.id || editingItem.id <= 0)) {
-        throw new Error('Invalid item ID. Please try again.');
+        throw new Error(t('admin.items.modal.validation.invalidId'))
       }
 
       const submitData = {
@@ -169,7 +172,9 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">
-                {editingItem ? `Edit ${editingItem.name}` : 'New Item'}
+                {editingItem
+                  ? t('admin.items.modal.editTitle', { name: editingItem.name })
+                  : t('admin.items.modal.newTitle')}
               </h2>
               <button
                 onClick={onClose}
@@ -188,45 +193,45 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
                 </p>
               </div>
             )}
-            {/* Form – GRID KEPT */}
+            {/* Form – */}
             <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Item Code *</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2"> {t('admin.items.modal.fields.code')} *</label>
                 <input
                   value={formData.code}
                   onChange={(e) => setFormData({ ...formData, code: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md"
-                  placeholder='Item Code'
+                  placeholder={t('admin.items.modal.placeholders.code')}
                   required
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Category *</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{t('admin.items.modal.fields.category')} *</label>
                 <select
                   value={formData.categoryName}
                   onChange={(e) => setFormData({ ...formData, categoryName: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md"
                   required
                 >
-                  <option value="">Select Category</option>
+                  <option value="">{t('admin.items.modal.placeholders.category')}</option>
                   {categories.map(c => (
-                    <option key={c.id} value={c.name}>{c.name}</option>
+                    <option key={c.id} value={c.name}>{pickLang(c.name, c.arabicName)}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Item Name *</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{t('admin.items.modal.fields.name')} *</label>
                 <input
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md"
-                  placeholder='Item Name'
+                  placeholder={t('admin.items.modal.placeholders.name')}
                   required
                 />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Item Name (Arabic) *
+                  {t('admin.items.modal.fields.arabicName')}  *
                 </label>
                 <input
                   value={formData.arabicName}
@@ -234,13 +239,13 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     setFormData({ ...formData, arabicName: e.target.value })
                   }
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white shadow-sm"
-                  placeholder="اسم القطعة"
+                  placeholder={t('admin.items.modal.placeholders.arabicName')}
                   required
                   dir="rtl"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Karat *</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">{t('admin.items.modal.fields.karat')} *</label>
                 <select
                   value={formData.karatName}
                   onChange={(e) => setFormData({ ...formData, karatName: e.target.value })}
@@ -248,79 +253,80 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md disabled:opacity-50"
                   required
                 >
-                  <option value="">Select Karat</option>
+                  <option value="">{t('admin.items.modal.placeholders.karat')}</option>
                   {karats.map(k => (
                     <option key={k.id} value={k.name}>{k.displayName}</option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-3">Weight (grams) *</label>
+                <label className="block text-sm font-bold text-gray-700 mb-3">{t('admin.items.modal.fields.weight')} *</label>
                 <input
                   required
                   type="number" step="0.01"
                   value={formData.weight}
-                  placeholder='Item Weight (g)'
+                  placeholder={t('admin.items.modal.placeholders.weight')}
                   onChange={(e) => setFormData({ ...formData, weight: e.target.value === '' ? '' : Number(e.target.value), })}
                   className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-400/50 focus:border-blue-400 text-s shadow-sm transition-all duration-300"
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-3">Factory Price ($/gram) *</label>
+                <label className="block text-sm font-bold text-gray-700 mb-3">{t('admin.items.modal.fields.factoryPrice')} *</label>
                 <input
                   required
                   type="number" step="0.01"
                   value={formData.factoryPrice}
-                  placeholder='Item Factory price per (g)'
+                  placeholder={t('admin.items.modal.placeholders.factoryPrice')}
                   onChange={(e) => setFormData({ ...formData, factoryPrice: e.target.value === '' ? '' : Number(e.target.value), })}
                   className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-400/50 focus:border-blue-400 text-s shadow-sm transition-all duration-300"
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-3">Stock Count *</label>
+                <label className="block text-sm font-bold text-gray-700 mb-3">{t('admin.items.modal.fields.stock')}  *</label>
                 <input
                   required
                   type="number"
                   value={formData.inStockCount}
-                  placeholder='In Stock Count'
+                  placeholder={t('admin.items.modal.placeholders.stock')}
                   onChange={(e) => setFormData({ ...formData, inStockCount: e.target.value === '' ? '' : Number(e.target.value), })}
                   className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-emerald-400/50 focus:border-emerald-400 text-s shadow-sm transition-all duration-300"
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-3">Reserved Count</label>
+                <label className="block text-sm font-bold text-gray-700 mb-3">{t('admin.items.modal.fields.reserved')}</label>
                 <input
                   type="number"
                   value={formData.reservedCount}
-                  placeholder='Reserved Items Count'
+                  placeholder={t('admin.items.modal.placeholders.reserved')}
                   onChange={(e) => setFormData({ ...formData, reservedCount: e.target.value === '' ? '' : Number(e.target.value), })}
                   className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-orange-400/50 focus:border-orange-400 text-s shadow-sm transition-all duration-300"
                 />
               </div>
               <div className="lg:col-span-2">
-                <label className="block text-sm font-bold text-gray-700 mb-3">Image URL *</label>
+                <label className="block text-sm font-bold text-gray-700 mb-3">{t('admin.items.modal.fields.imageUrl')} *</label>
                 <input
                   required
                   value={formData.imageUrl}
                   onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
                   className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-400/50 focus:border-purple-400 text-s shadow-sm transition-all duration-300"
-                  placeholder="https://drive.google.com/..."
+                  dir='ltr'
+                  placeholder={t('admin.items.modal.placeholders.imageUrl')}
                 />
-                <p className="text-xs text-gray-500 mt-2">Use Google Drive URLs</p>
+                <p className="text-xs text-gray-500 mt-2">{t('admin.items.modal.hint.drive')}</p>
               </div>
               <div className="lg:col-span-2">
-                <label className="block text-sm font-bold text-gray-700 mb-3">Description</label>
+                <label className="block text-sm font-bold text-gray-700 mb-3">{t('admin.items.modal.fields.description')}</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
                   className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-400/50 focus:border-purple-400 text-s shadow-sm transition-all duration-300 resize-vertical"
-                  placeholder="Optional: Add item description..."
+                  placeholder={t('admin.items.modal.placeholders.description')}
                 />
               </div>
               <div className="lg:col-span-2">
                 <label className="block text-sm font-bold text-gray-700 mb-3">
-                  Description (Arabic)
+                  {t('admin.items.modal.fields.arabicDescription')}
                 </label>
                 <textarea
                   value={formData.arabicDescription}
@@ -330,21 +336,32 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
                   rows={3}
                   dir="rtl"
                   className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-400/50 focus:border-purple-400 shadow-sm resize-vertical"
-                  placeholder="اختياري: الوصف بالعربية..."
+                  placeholder={t('admin.items.modal.fields.arabicDescription')}
                 />
               </div>
               <div className="lg:col-span-2">
-                <label className="block text-sm font-bold text-gray-700 mb-3">Status</label>
+                <label className="block text-sm font-bold text-gray-700 mb-3">{t('admin.items.modal.fields.status')}</label>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
                     type="checkbox"
                     checked={formData.isActive}
-                    onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, isActive: e.target.checked })
+                    }
                     className="sr-only peer"
                   />
-                  <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-600"></div>
-                  <span className="ml-3 text-sm font-medium text-gray-900">
-                    {formData.isActive ? 'Active' : 'Inactive'}
+                  <div className="relative w-14 h-7 rounded-full transition-colors bg-gray-300 peer-checked:bg-blue-600">
+                    <span
+                      className={`absolute top-[2px] h-6 w-6 rounded-full bg-white shadow transition-transform ltr:left-[2px] rtl:right-[2px]
+                          ${formData.isActive
+                          ? 'ltr:translate-x-7 rtl:-translate-x-7'
+                          : 'translate-x-0'}`}
+                    />
+                  </div>
+                  <span className="ms-3 text-sm font-medium text-gray-900">
+                    {formData.isActive
+                      ? t('common.active')
+                      : t('common.inactive')}
                   </span>
                 </label>
               </div>
@@ -355,7 +372,11 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
                   disabled={submitLoading}
                   className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-2 px-4 rounded-xl text-lg font-bold shadow-xl hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {submitLoading ? 'Saving…' : editingItem ? 'Update Item' : 'Create Item'}
+                  {submitLoading
+                    ? t('admin.items.modal.actions.saving')
+                    : editingItem
+                      ? t('admin.items.modal.actions.update')
+                      : t('admin.items.modal.actions.create')}
                 </button>
 
                 <button
@@ -363,7 +384,7 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
                   onClick={onClose}
                   className="flex-1 py-2 px-4 rounded-xl text-lg font-bold border border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow-md"
                 >
-                  Cancel
+                  {t('admin.items.modal.actions.cancel')}
                 </button>
               </div>
             </form>

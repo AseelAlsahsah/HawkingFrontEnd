@@ -146,7 +146,7 @@ const ar = {
         loginTitle: 'تسجيل دخول',
         loginSubtitle: 'تسجيل الدخول لإدارة النظام',
         registerTitle: 'إنشاء حساب',
-        registerSubtitle: 'إعداد حساب مسؤول جديد',
+        registerSubtitle: 'انشاء حساب مسؤول جديد',
         username: 'اسم المستخدم',
         usernamePlaceholder: 'أدخل اسم المستخدم',
         usernameMin: 'الحد الأدنى 3 أحرف',
@@ -155,7 +155,7 @@ const ar = {
         passwordMin: 'الحد الأدنى 6 أحرف',
         signIn: 'تسجيل الدخول',
         signingIn: 'جاري تسجيل الدخول…',
-        createAdmin: 'إنشاء مسؤول',
+        createAdmin: 'إنشاء حساب',
         creating: 'جاري الإنشاء…',
         loading: 'جاري التحميل…',
         invalidCredentials: 'بيانات الدخول غير صحيحة',
@@ -166,8 +166,8 @@ const ar = {
         backToLogin: '← الرجوع إلى تسجيل الدخول',
 
         dashboard: {
-            title: 'لوحة تحكم المسؤول',
-            welcome: 'مرحباً،',
+            title: 'لوحة التحكم',
+            welcome: 'مرحبًا،',
             logout: 'تسجيل الخروج',
 
             management: 'الإدارة',
@@ -195,7 +195,7 @@ const ar = {
             searchByCode: 'رمز المنتج',
             searchByNamePlaceholder: 'ابحث باسم المنتج',
             searchByCodePlaceholder: 'ابحث برمز المنتج',
-            filterCategory: 'تصفية حسب الفئة',
+            filterCategory: 'فلترة حسب الفئة',
             allCategories: 'جميع الفئات',
 
             loadingTitle: 'جاري تحميل المنتجات...',
@@ -207,7 +207,8 @@ const ar = {
             addNew: 'إضافة منتج جديد',
             addFirst: 'إضافة أول منتج',
 
-            showingResults: 'عرض {{count}} نتيجة',
+            showingResults: 'عرض النتائج المحتملة',
+            clearSearch: 'مسح البحث',
 
             table: {
                 code: 'الرمز',
@@ -228,7 +229,81 @@ const ar = {
                 inactive: 'غير مفعل',
             },
 
-            clearSearch: 'مسح البحث',
+            actions: {
+                deleteSuccess: 'تم حذف "{{code}}" بنجاح',
+                deleteFailed: 'فشل حذف المنتج',
+                confirmTitle: 'حذف المنتج ({{code}})؟',
+                confirmText:
+                    'لا يمكن التراجع عن هذا الإجراء، وسيتم حذفه نهائياً من النظام.',
+                confirmDelete: 'حذف',
+                cancel: 'إلغاء',
+            },
+
+            modal: {
+                newTitle: 'إضافة قطعة جديدة',
+                editTitle: 'تعديل {{name}}',
+
+                validation: {
+                    codeRequired: 'رمز القطعة مطلوب',
+                    nameRequired: 'اسم القطعة مطلوب',
+                    arabicNameRequired: 'اسم القطعة بالعربية مطلوب',
+                    categoryRequired: 'يرجى اختيار الفئة',
+                    karatRequired: 'يرجى اختيار العيار',
+                    imageRequired: 'رابط الصورة مطلوب',
+                    weightRequired: 'الوزن مطلوب',
+                    factoryPriceRequired: 'سعر المصنع مطلوب',
+                    stockRequired: 'عدد المخزون مطلوب',
+                    invalidId: 'معرّف القطعة غير صالح، حاول مرة أخرى',
+                    saveFailed: 'فشل حفظ القطعة',
+                },
+
+                fields: {
+                    code: 'رمز القطعة',
+                    category: 'الفئة',
+                    name: 'اسم القطعة',
+                    arabicName: 'اسم القطعة (بالعربية)',
+                    karat: 'العيار',
+                    weight: 'الوزن (غرام)',
+                    factoryPrice: 'سعر المصنع (دولار/غرام)',
+                    stock: 'عدد المخزون',
+                    reserved: 'عدد المحجوز',
+                    imageUrl: 'رابط الصورة',
+                    description: 'الوصف',
+                    arabicDescription: 'الوصف (بالعربية)',
+                    status: 'الحالة',
+                },
+
+                placeholders: {
+                    code: 'رمز القطعة',
+                    name: 'اسم القطعة',
+                    arabicName: 'اسم القطعة',
+                    category: 'اختر الفئة',
+                    karat: 'اختر العيار',
+                    weight: 'وزن القطعة (غ)',
+                    factoryPrice: 'سعر المصنع للغرام',
+                    stock: 'عدد القطع المتوفرة',
+                    reserved: 'عدد القطع المحجوزة',
+                    imageUrl: 'https://drive.google.com/...',
+                    description: 'اختياري: أضف وصف القطعة...',
+                    arabicDescription: 'اختياري: الوصف بالعربية...',
+                },
+
+                status: {
+                    active: 'نشط',
+                    inactive: 'غير نشط',
+                },
+
+                actions: {
+                    create: 'إضافة القطعة',
+                    update: 'تحديث القطعة',
+                    cancel: 'إلغاء',
+                    saving: 'جارٍ الحفظ…',
+                },
+
+                hint: {
+                    drive: 'استخدم روابط Google Drive',
+                },
+            },
         },
 
         karats: {
@@ -432,7 +507,7 @@ const ar = {
             addNew: 'إضافة خصم جديد',
             all: 'جميع الخصومات ({{count}})',
 
-            percentage: 'نسبة الخصم',
+            percentage: 'نسبة الخصم %',
             startDate: 'تاريخ البداية',
             endDate: 'تاريخ النهاية',
             itemsCount: 'عدد المنتجات',
@@ -464,7 +539,7 @@ const ar = {
             form: {
                 newTitle: 'خصم جديد',
                 editTitle: 'تعديل الخصم',
-                percentage: 'نسبة الخصم',
+                percentage: 'نسبة الخصم ٪',
                 percentagePlaceholder: '٪ الخصم',
                 startDate: 'تاريخ البداية',
                 endDate: 'تاريخ النهاية',
