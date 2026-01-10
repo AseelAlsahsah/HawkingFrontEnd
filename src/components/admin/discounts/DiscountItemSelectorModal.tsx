@@ -25,7 +25,6 @@ interface Props {
 const DiscountItemSelectorModal: React.FC<Props> = ({
   open,
   mode,
-  discountId,
   existingItems,
   onClose,
   onConfirm,

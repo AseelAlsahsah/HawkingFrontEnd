@@ -1,7 +1,8 @@
 import axios from "axios";
+import { API_BASE_URL } from "../config/api";
 
 const api = axios.create({
-  baseURL: "/api/v1",
+  baseURL: `${API_BASE_URL}/api/v1`,
 });
 
 //----------------------------Collection page --------------------
@@ -71,7 +72,7 @@ export interface ItemDetail {
 }
 
 export async function fetchItemByCode(code: string): Promise<ItemDetail> {
-  const response = await fetch(`/api/v1/items/${code}`);
+  const response = await fetch(`${API_BASE_URL}/api/v1/items/${code}`);
   if (!response.ok) {
     throw new Error(`Failed to fetch item: ${response.statusText}`);
   }
@@ -92,7 +93,7 @@ export interface ReservationRequest {
 }
 
 export async function createReservation(request: ReservationRequest): Promise<any> {
-  const response = await fetch('/api/v1/reservations', {
+  const response = await fetch(`${API_BASE_URL}/api/v1/reservations`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(request)

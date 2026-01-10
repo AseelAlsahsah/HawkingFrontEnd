@@ -6,6 +6,7 @@ import type { Item } from "../services/api";
 import { searchItems } from "../services/api";  
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
+import { pickLang } from "../utils/i18nHelpers";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -152,10 +153,18 @@ export default function Navbar() {
                         }}
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="font-medium text-sm text-gray-900 truncate">{item.name}</p>
+                        <p className="font-medium text-sm text-gray-900 truncate">{pickLang(item.name, item.arabicName)}</p>
                         <p className="text-xs text-gray-500 truncate">{item.code}</p>
                         <p className="text-sm font-semibold text-gold-600">
-                          JD{item.priceBeforeDiscount.toFixed(3)}
+                          {item.discountPercentage && item.priceAfterDiscount ? (
+                            <p>
+                              JD{item.priceAfterDiscount.toFixed(3)}
+                            </p>
+                          ) : (
+                            <p>
+                              JD{item.priceBeforeDiscount.toFixed(3)}
+                            </p>
+                          )}
                         </p>
                       </div>
                     </Link>

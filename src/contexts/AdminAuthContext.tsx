@@ -33,6 +33,7 @@ export const AdminAuthProvider: React.FC<AdminAuthProviderProps> = ({ children }
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();  // ← NEW
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;  
 
   useEffect(() => {
     const savedToken = localStorage.getItem('adminToken');
@@ -46,7 +47,7 @@ export const AdminAuthProvider: React.FC<AdminAuthProviderProps> = ({ children }
 
   const login = async (username: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      const response = await fetch('http://localhost:9000/api/v1/admin/login', {
+      const response = await fetch(`${API_BASE_URL}/api/v1/admin/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
@@ -72,7 +73,7 @@ export const AdminAuthProvider: React.FC<AdminAuthProviderProps> = ({ children }
 
   const register = async (username: string, password: string, role: string): Promise<{ success: boolean; message?: string; error?: string }> => {
     try {
-      const response = await fetch('http://localhost:9000/api/v1/admin/register', {
+      const response = await fetch(`${API_BASE_URL}/api/v1/admin/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password, role }),
@@ -89,7 +90,7 @@ export const AdminAuthProvider: React.FC<AdminAuthProviderProps> = ({ children }
     try {
       // Call backend logout API
       if (token) {
-        await fetch('http://localhost:9000/api/v1/admin/logout', {
+        await fetch(`${API_BASE_URL}/api/v1/admin/logout`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`,
