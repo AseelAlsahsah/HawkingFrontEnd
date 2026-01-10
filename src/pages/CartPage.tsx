@@ -40,7 +40,7 @@ export default function CartPage() {
               <h1 className="text-3xl font-bold text-gray-900 mb-6">{t('cart.title')}</h1>
               <div className="space-y-4">
                 {cart.map((item) => (
-                  <div key={item.id} className="bg-white/80 p-6 rounded-2xl border shadow-sm flex gap-4">
+                  <div key={item.id} className="bg-white/80 p-4 sm:p-6 rounded-2xl border shadow-sm flex flex-col sm:flex-row gap-4">
                     <img
                       src={item.imageUrl}
                       alt={item.name}
@@ -54,19 +54,19 @@ export default function CartPage() {
                           {item.code}
                         </span>
                       </span>
-                      <div className="flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3 min-w-0 flex-1">
-                          <span dir="ltr" className="text-lg sm:text-xl font-bold text-gold-600 truncate">
-                            ${item.price.toFixed(3)}
-                          </span>
-                          <div className="flex items-center gap-1 flex-shrink-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-3">
+                        <span dir="ltr" className="text-lg sm:text-xl font-bold text-gold-600">
+                          ${item.price.toFixed(3)}
+                        </span>
+                        <div className="flex items-center justify-between sm:justify-end gap-3">
+                          <div className="flex items-center gap-1">
                             <button
                               onClick={() => updateQuantity(item.id, item.quantity - 1)}
                               className="w-8 h-8 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50 text-sm"
                             >
                               −
                             </button>
-                            <span className="w-12 text-center text-lg font-semibold min-w-[2rem]">{item.quantity}</span>
+                            <span className="w-10 text-center text-lg font-semibold">{item.quantity}</span>
                             <button
                               onClick={() => updateQuantity(item.id, item.quantity + 1)}
                               className="w-8 h-8 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50 text-lg"
@@ -74,13 +74,13 @@ export default function CartPage() {
                               +
                             </button>
                           </div>
+                          <button
+                            onClick={() => removeItem(item.id)}
+                            className="text-red-500 hover:text-red-700 font-medium text-sm whitespace-nowrap"
+                          >
+                            {t('cart.remove')}
+                          </button>
                         </div>
-                        <button
-                          onClick={() => removeItem(item.id)}
-                          className="text-red-500 hover:text-red-700 font-medium text-sm px-2 py-1 whitespace-nowrap flex-shrink-0 ml-2"
-                        >
-                          {t('cart.remove')}
-                        </button>
                       </div>
                     </div>
                   </div>

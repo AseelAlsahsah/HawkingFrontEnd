@@ -92,23 +92,27 @@ const DiscountFormModal: React.FC<DiscountFormModalProps> = ({
                             </p>
                         </div>
 
-                        <button
-                            type="button"
-                            onClick={() =>
-                                onChange({ ...formState, isActive: !formState.isActive })
-                            }
-                            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors
-                    ${formState.isActive ? 'bg-emerald-500' : 'bg-gray-300'}
-                    `}
-                        >
-                            <span
-                                className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform
-                        ${formState.isActive
-                            ? 'ltr:translate-x-5 rtl:-translate-x-5'
-                            : 'ltr:translate-x-1 rtl:-translate-x-1'}
-                    `}
+                        <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={formState.isActive}
+                                onChange={(e) =>
+                                    onChange({ ...formState, isActive: e.target.checked })
+                                }
+                                className="sr-only peer"
                             />
-                        </button>
+                            <div
+                                className="w-11 h-6 bg-gray-300 rounded-full relative
+                                    peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300
+                                    peer-checked:bg-emerald-500
+                                    after:content-['']
+                                    after:absolute after:top-[2px] after:start-[2px]
+                                    after:bg-white after:rounded-full after:h-5 after:w-5
+                                    after:transition-all
+                                    peer-checked:after:translate-x-full
+                                    rtl:peer-checked:after:-translate-x-full"
+                            />
+                        </label>
                     </div>
 
                     <div className="flex justify-end gap-3 pt-4">

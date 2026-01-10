@@ -49,7 +49,6 @@ const AdminDashboard: React.FC = () => {
     { labelKey: 'discounts', path: '/admin/discounts', color: 'rose' },
   ];
 
-
   const handleLogout = async () => {
     await logout();
     setShowLogoutModal(false);
@@ -57,36 +56,40 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+      {/* ============================ HEADER ============================ */}
       <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">
-              {t('admin.dashboard.title')}
-            </h1>
-            <p className="text-sm text-gray-500 mt-1">
-              {t('admin.dashboard.welcome')}{' '}
-              <span className="font-semibold text-amber-600" dir="ltr">
-                {user?.username}
-              </span>
-            </p>
-          </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            {/* Title */}
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                {t('admin.dashboard.title')}
+              </h1>
+              <p className="text-sm text-gray-500 mt-1">
+                {t('admin.dashboard.welcome')}{' '}
+                <span className="font-semibold text-amber-600" dir="ltr">
+                  {user?.username}
+                </span>
+              </p>
+            </div>
 
-          <div className="flex items-center gap-4">
+            {/* Actions */}
+            <div className="flex items-center justify-between sm:justify-end gap-3">
+              <LanguageSwitcher />
 
-            <button
-              onClick={() => setShowLogoutModal(true)}
-              className="px-4 py-2 text-sm font-semibold border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition"
-            >
-              {t('admin.dashboard.logout')}
-            </button>
-            <LanguageSwitcher />
+              <button
+                onClick={() => setShowLogoutModal(true)}
+                className="px-3 sm:px-4 py-2 text-sm font-semibold border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition"
+              >
+                {t('admin.dashboard.logout')}
+              </button>
+            </div>
           </div>
         </div>
       </header>
 
-      {/* Content */}
-      <main className="max-w-7xl mx-auto px-6 py-10">
+      {/* ============================ CONTENT ============================ */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
         {/* Section title */}
         <div className="mb-8">
           <h2 className="text-xl font-bold text-gray-900">
@@ -128,7 +131,7 @@ const AdminDashboard: React.FC = () => {
         </div>
       </main>
 
-      {/* Logout Modal */}
+      {/* ============================ LOGOUT MODAL ============================ */}
       {showLogoutModal && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl shadow-2xl max-w-md w-full border border-gray-200">
@@ -151,7 +154,7 @@ const AdminDashboard: React.FC = () => {
                   onClick={() => setShowLogoutModal(false)}
                   className="flex-1 bg-gray-100 hover:bg-gray-200 py-2 rounded-lg font-semibold"
                 >
-                   {t('common.cancel')}
+                  {t('common.cancel')}
                 </button>
               </div>
             </div>

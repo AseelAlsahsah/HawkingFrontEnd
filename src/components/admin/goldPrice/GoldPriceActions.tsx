@@ -3,6 +3,7 @@ import type { AdminGoldPrice } from '../../../services/adminApi';
 import { adminDeleteGoldPrice } from '../../../services/adminApi';
 import { useToast } from '../../../contexts/ToastContext';
 import { useTranslation } from 'react-i18next';
+import ModalPortal from '../../ModalPortal';
 
 interface GoldPriceActionsProps {
   goldPrice: AdminGoldPrice;
@@ -87,49 +88,51 @@ const GoldPriceActions: React.FC<GoldPriceActionsProps> = ({
 
       {/* DELETE CONFIRMATION MODAL */}
       {showDeleteModal && (
-        <div className="fixed inset-0 bg-black/10 flex items-center justify-center z-50 p-4 animate-in fade-in zoom-in duration-200">
-          <div className="bg-white/95 rounded-xl shadow-2xl max-w-md w-full mx-4 border border-gray-200 animate-in slide-in-from-bottom-4 duration-300">
-            <div className="p-8 text-center">
-              <div className="w-20 h-20 mx-auto bg-white rounded-xl flex items-center justify-center">
-                <svg className="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-black text-gray-900 mb-3">
-                {t('admin.goldPrices.actions.confirmTitle', {
-                  karat: goldPrice.karat.displayName,
-                  date: new Date(goldPrice.effectiveDate).toLocaleDateString()
-                })}
-              </h3>
-              <p className="text-sm text-gray-500 mb-8 leading-relaxed">
-                {t('admin.goldPrices.actions.confirmText')}
-              </p>
-              <div className="flex gap-4">
-                <button
-                  onClick={() => setShowDeleteModal(false)}
-                  disabled={deleting}
-                  className="flex-1 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-900 font-bold py-1 px-4 rounded-xl text-lg border border-gray-300"
-                >
-                  {t('admin.goldPrices.actions.cancel')}
-                </button>
-                <button
-                  onClick={handleDelete}
-                  disabled={deleting}
-                  className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-4 rounded-xl text-lg border border-red-600/50"
-                >
-                  {deleting ? (
-                    <>
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      {t('admin.goldPrices.actions.deleting')}
-                    </>
-                  ) : (
-                    t('admin.goldPrices.actions.confirmDelete')
-                  )}
-                </button>
+        <ModalPortal>
+          <div className="fixed inset-0 bg-black/10 flex items-center justify-center z-50 p-4 animate-in fade-in zoom-in duration-200">
+            <div className="bg-white/95 rounded-xl shadow-2xl max-w-md w-full mx-4 border border-gray-200 animate-in slide-in-from-bottom-4 duration-300">
+              <div className="p-8 text-center">
+                <div className="w-20 h-20 mx-auto bg-white rounded-xl flex items-center justify-center">
+                  <svg className="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-black text-gray-900 mb-3">
+                  {t('admin.goldPrices.actions.confirmTitle', {
+                    karat: goldPrice.karat.displayName,
+                    date: new Date(goldPrice.effectiveDate).toLocaleDateString()
+                  })}
+                </h3>
+                <p className="text-sm text-gray-500 mb-8 leading-relaxed">
+                  {t('admin.goldPrices.actions.confirmText')}
+                </p>
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => setShowDeleteModal(false)}
+                    disabled={deleting}
+                    className="flex-1 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-900 font-bold py-1 px-4 rounded-xl text-lg border border-gray-300"
+                  >
+                    {t('admin.goldPrices.actions.cancel')}
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    disabled={deleting}
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-4 rounded-xl text-lg border border-red-600/50"
+                  >
+                    {deleting ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                        {t('admin.goldPrices.actions.deleting')}
+                      </>
+                    ) : (
+                      t('admin.goldPrices.actions.confirmDelete')
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </ModalPortal>
       )}
     </>
   );

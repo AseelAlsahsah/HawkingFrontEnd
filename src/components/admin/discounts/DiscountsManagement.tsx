@@ -17,6 +17,7 @@ import DiscountItemsModal from './DiscountItemsModal';
 import DeleteDiscountModal from './DeleteDiscountModal';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../LanguageSwitcher';
+import ModalPortal from '../../ModalPortal';
 
 /* ===================== FORMATTERS ===================== */
 const formatDateTime = (value: string) =>
@@ -193,30 +194,34 @@ const DiscountsManagement: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">{t('admin.discounts.title')}</h1>
-            <p className="text-sm text-gray-500 font-medium">
-              {t('admin.discounts.subtitle')}
-            </p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <button
-              onClick={() => navigate('/admin/dashboard')}
-              className="px-4 py-2 text-sm font-semibold text-gray-800 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 rounded-xl border border-gray-200 shadow-sm flex items-center gap-2"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              {t('common.backToDashboard')}
-            </button>
-            <button
-              onClick={openCreateModal}
-              className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold rounded-xl shadow-xl transition-all duration-300 flex items-center gap-2"
-            >
-              {t('admin.discounts.addNew')}
-            </button>
-            <LanguageSwitcher />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                {t('admin.discounts.title')}
+              </h1>
+              <p className="text-sm text-gray-500 font-medium mt-1">
+                {t('admin.discounts.subtitle')}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3 sm:justify-end">
+              <button
+                onClick={() => navigate('/admin/dashboard')}
+                className="px-4 py-2 text-sm font-semibold text-gray-800 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 rounded-xl border border-gray-200 shadow-sm flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+                {t('common.backToDashboard')}
+              </button>
+              <button
+                onClick={openCreateModal}
+                className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold rounded-xl shadow-xl flex items-center gap-2"
+              >
+                {t('admin.discounts.addNew')}
+              </button>
+              <LanguageSwitcher />
+            </div>
           </div>
         </div>
       </header>
@@ -254,10 +259,24 @@ const DiscountsManagement: React.FC = () => {
                       {formatPercentage(d.percentage)}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
-                      {formatDateTime(d.startDate)}
+                      <div className="flex flex-col gap-1">
+                        <span className="text-xs text-gray-400 sm:hidden">
+                          {t('admin.discounts.startDate')}
+                        </span>
+                        <span className="whitespace-nowrap">
+                          {formatDateTime(d.startDate)}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">
-                      {formatDateTime(d.endDate)}
+                      <div className="flex flex-col gap-1">
+                        <span className="text-xs text-gray-400 sm:hidden">
+                          {t('admin.discounts.endDate')}
+                        </span>
+                        <span className="whitespace-nowrap">
+                          {formatDateTime(d.endDate)}
+                        </span>
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       {d.isActive ? (
@@ -278,7 +297,8 @@ const DiscountsManagement: React.FC = () => {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-center">
-                      <div className="flex items-center justify-center gap-2">
+                      {/* ================= DESKTOP ACTIONS ================= */}
+                      <div className="hidden sm:flex items-center justify-center gap-2">
                         <button
                           onClick={() => openEditModal(d)}
                           className="px-2 py-1 text-xs font-semibold bg-white border border-gray-300 rounded-lg hover:bg-gray-50 shadow-sm"
@@ -293,7 +313,7 @@ const DiscountsManagement: React.FC = () => {
                         </button>
                         <button
                           onClick={() => openItemsModal(d, 'add')}
-                          className={"px-1 py-1 text-xs font-semibold rounded-lg border shadow-sm bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"}
+                          className="px-1 py-1 text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 shadow-sm"
                         >
                           {t('admin.discounts.addItems')}
                         </button>
@@ -309,6 +329,69 @@ const DiscountsManagement: React.FC = () => {
                         >
                           {t('common.delete')}
                         </button>
+                      </div>
+                      {/* ================= MOBILE ACTION MENU ================= */}
+                      <div className="relative sm:hidden flex justify-center">
+                        <button
+                          onClick={() =>
+                            setViewItemsDiscount(
+                              viewItemsDiscount?.id === d.id ? null : d
+                            )
+                          }
+                          className="p-2 rounded-lg border border-gray-300 bg-white shadow-sm"
+                          aria-label="Actions"
+                        >
+                          ⋮
+                        </button>
+                        {viewItemsDiscount?.id === d.id && (
+                          <div className="absolute right-0 top-10 z-30 w-44 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+                            <button
+                              onClick={() => {
+                                setViewItemsDiscount(null);
+                                openEditModal(d);
+                              }}
+                              className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50"
+                            >
+                              {t('common.edit')}
+                            </button>
+                            <button
+                              onClick={() => {
+                                setViewItemsDiscount(null);
+                                setViewItemsDiscount(d);
+                              }}
+                              className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50"
+                            >
+                              {t('admin.discounts.viewItems')}
+                            </button>
+                            <button
+                              onClick={() => {
+                                setViewItemsDiscount(null);
+                                openItemsModal(d, 'add');
+                              }}
+                              className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50"
+                            >
+                              {t('admin.discounts.addItems')}
+                            </button>
+                            <button
+                              onClick={() => {
+                                setViewItemsDiscount(null);
+                                openItemsModal(d, 'remove');
+                              }}
+                              className="w-full px-4 py-2 text-sm text-left hover:bg-gray-50"
+                            >
+                              {t('admin.discounts.removeItems')}
+                            </button>
+                            <button
+                              onClick={() => {
+                                setViewItemsDiscount(null);
+                                setDeleteTarget(d);
+                              }}
+                              className="w-full px-4 py-2 text-sm text-left text-red-600 hover:bg-red-50"
+                            >
+                              {t('common.delete')}
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -345,12 +428,14 @@ const DiscountsManagement: React.FC = () => {
       )}
       {/* ===================== DELETE CONFIRMATION ===================== */}
       {deleteTarget && (
-        <DeleteDiscountModal
-          discount={deleteTarget}
-          loading={deleteLoading}
-          onConfirm={confirmDelete}
-          onCancel={() => setDeleteTarget(null)}
-        />
+        <ModalPortal>
+          <DeleteDiscountModal
+            discount={deleteTarget}
+            loading={deleteLoading}
+            onConfirm={confirmDelete}
+            onCancel={() => setDeleteTarget(null)}
+          />
+        </ModalPortal>
       )}
       {/* ===================== ITEM SELECTOR ===================== */}
       {itemTargetDiscount && (

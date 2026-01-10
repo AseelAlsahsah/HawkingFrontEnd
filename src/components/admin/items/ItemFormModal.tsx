@@ -185,14 +185,6 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
                 </svg>
               </button>
             </div>
-            {/* Error */}
-            {modalError && (
-              <div className="p-3 mb-5 bg-red-50 border border-red-200 rounded-xl">
-                <p className="text-sm font-semibold text-red-800">
-                  {modalError}
-                </p>
-              </div>
-            )}
             {/* Form – */}
             <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div>
@@ -336,7 +328,7 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
                   rows={3}
                   dir="rtl"
                   className="w-full px-5 py-2 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-purple-400/50 focus:border-purple-400 shadow-sm resize-vertical"
-                  placeholder={t('admin.items.modal.fields.arabicDescription')}
+                  placeholder={t('admin.items.modal.placeholders.arabicDescription')}
                 />
               </div>
               <div className="lg:col-span-2">
@@ -350,27 +342,39 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
                     }
                     className="sr-only peer"
                   />
-                  <div className="relative w-14 h-7 rounded-full transition-colors bg-gray-300 peer-checked:bg-blue-600">
-                    <span
-                      className={`absolute top-[2px] h-6 w-6 rounded-full bg-white shadow transition-transform ltr:left-[2px] rtl:right-[2px]
-                          ${formData.isActive
-                          ? 'ltr:translate-x-7 rtl:-translate-x-7'
-                          : 'translate-x-0'}`}
-                    />
-                  </div>
-                  <span className="ms-3 text-sm font-medium text-gray-900">
-                    {formData.isActive
-                      ? t('common.active')
-                      : t('common.inactive')}
+
+                  <div
+                    className="w-14 h-7 bg-gray-200 rounded-full relative
+                      peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300
+                      peer-checked:bg-blue-600
+                      after:content-['']
+                      after:absolute after:top-[2px] after:start-[2px]
+                      after:bg-white after:border after:border-gray-300
+                      after:rounded-full after:h-6 after:w-6
+                      after:transition-all
+                      peer-checked:after:translate-x-full
+                      rtl:peer-checked:after:-translate-x-full"
+                  />
+
+                  <span className="ms-3 text-sm font-medium text-gray-900 whitespace-nowrap">
+                    {formData.isActive ? t('common.active') : t('common.inactive')}
                   </span>
                 </label>
               </div>
+              {/* Error */}
+              {modalError && (
+                <div className="lg:col-span-2 p-3 bg-red-50 border border-red-200 rounded-xl">
+                  <p className="text-sm font-semibold text-red-800">
+                    {modalError}
+                  </p>
+                </div>
+              )}
               {/* Actions */}
               <div className="lg:col-span-2 flex gap-3 pt-2">
                 <button
                   type="submit"
                   disabled={submitLoading}
-                  className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-2 px-4 rounded-xl text-lg font-bold shadow-xl hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-2 px-4 rounded-xl text-lg font-semibold shadow-xl hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitLoading
                     ? t('admin.items.modal.actions.saving')
@@ -382,7 +386,7 @@ const ItemFormModal: React.FC<ItemFormModalProps> = ({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 py-2 px-4 rounded-xl text-lg font-bold border border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow-md"
+                  className="flex-1 py-2 px-4 rounded-xl text-lg font-semibold border border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow-md"
                 >
                   {t('admin.items.modal.actions.cancel')}
                 </button>

@@ -215,7 +215,7 @@ const GoldPriceFormModal: React.FC<GoldPriceFormModalProps> = ({
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-2 px-4 rounded-xl text-lg font-bold shadow-xl hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white py-2 px-4 rounded-xl text-medium font-bold shadow-xl hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {loading ? (
                     <>
@@ -232,7 +232,7 @@ const GoldPriceFormModal: React.FC<GoldPriceFormModalProps> = ({
                   type="button"
                   onClick={onClose}
                   disabled={loading}
-                  className="flex-1 py-2 px-4 rounded-xl text-lg font-bold border border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 py-2 px-4 rounded-xl text-medium font-bold border border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {t('admin.goldPrices.actions.cancel')}
                 </button>
