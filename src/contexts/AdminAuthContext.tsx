@@ -12,7 +12,7 @@ interface AuthState {
   loading: boolean;
   login: (username: string, password: string) => Promise<{ success: boolean; error?: string }>;
   register: (username: string, password: string, role: string) => Promise<{ success: boolean; message?: string; error?: string }>;
-  logout: () => Promise<void>; 
+  logout: () => Promise<void>;
   isAdmin: boolean;
 }
 
@@ -33,7 +33,7 @@ export const AdminAuthProvider: React.FC<AdminAuthProviderProps> = ({ children }
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();  // ← NEW
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;  
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   useEffect(() => {
     const savedToken = localStorage.getItem('adminToken');
@@ -56,13 +56,13 @@ export const AdminAuthProvider: React.FC<AdminAuthProviderProps> = ({ children }
       if (!response.ok) throw new Error('Login failed');
 
       const data = await response.json();
-      
+
       localStorage.setItem('adminToken', data.token);
       localStorage.setItem('adminUser', JSON.stringify({
         username: data.username,
         role: data.role
       }));
-      
+
       setToken(data.token);
       setUser({ username: data.username, role: data.role });
       return { success: true };
@@ -71,7 +71,11 @@ export const AdminAuthProvider: React.FC<AdminAuthProviderProps> = ({ children }
     }
   };
 
-  const register = async (username: string, password: string, role: string): Promise<{ success: boolean; message?: string; error?: string }> => {
+  const register = async (
+    username: string,
+    password: string,
+    role: string
+  ): Promise<{ success: boolean; message?: string; error?: string }> => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/v1/admin/register`, {
         method: 'POST',
@@ -80,11 +84,26 @@ export const AdminAuthProvider: React.FC<AdminAuthProviderProps> = ({ children }
       });
 
       const data = await response.json();
-      return { success: data.message.includes('successfully'), message: data.message };
+
+      if (!response.ok) {
+        return {
+          success: false,
+          error: data?.status?.description || 'Registration failed',
+        };
+      }
+
+      return {
+        success: true,
+        message: data?.status?.description || 'Registered successfully',
+      };
     } catch (error) {
-      return { success: false, error: 'Registration failed' };
+      return {
+        success: false,
+        error: 'Network error. Please try again.',
+      };
     }
   };
+
 
   const logout = async (): Promise<void> => {
     try {
@@ -127,7 +146,7 @@ export const AdminAuthProvider: React.FC<AdminAuthProviderProps> = ({ children }
     loading,
     login,
     register,
-    logout, 
+    logout,
     isAdmin: user?.role === 'ADMIN'
   };
 
