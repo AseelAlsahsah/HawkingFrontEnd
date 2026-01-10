@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { adminFetchKarats } from '../../../services/api';
 import { adminCreateGoldPrice, adminUpdateGoldPrice, type AdminGoldPrice, type AdminKarat } from '../../../services/adminApi';
+import { useTranslation } from 'react-i18next';
 
 interface GoldPriceFormModalProps {
   showForm: boolean;
@@ -27,6 +28,7 @@ const GoldPriceFormModal: React.FC<GoldPriceFormModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [karatsLoading, setKaratsLoading] = useState(true);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const loadKarats = async () => {
@@ -71,16 +73,16 @@ const GoldPriceFormModal: React.FC<GoldPriceFormModalProps> = ({
       fallback
     );
   };
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.karatName || !formData.pricePerGram || !formData.effectiveDate) {
-      setError('Please fill all fields');
+      setError(t('admin.goldPrices.form.requiredError'));
       return;
     }
     const pricePerGram = parseFloat(formData.pricePerGram);
     if (isNaN(pricePerGram) || pricePerGram <= 0) {
-      setError('Please enter a valid price');
+      setError(t('admin.goldPrices.form.invalidPrice'));
       return;
     }
     try {
@@ -98,7 +100,7 @@ const GoldPriceFormModal: React.FC<GoldPriceFormModalProps> = ({
         await adminCreateGoldPrice(payload);
       }
       onClose();
-      await onSubmitSuccess(page); 
+      await onSubmitSuccess(page);
     } catch (err: any) {
       setError(getErrorMessage(err));
     } finally {
@@ -116,7 +118,7 @@ const GoldPriceFormModal: React.FC<GoldPriceFormModalProps> = ({
           <div className="p-6 pb-4">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">
-                {editingGoldPrice ? 'Edit Gold Price' : 'New Gold Price'}
+                {editingGoldPrice ? t('admin.goldPrices.editTitle') : t('admin.goldPrices.newTitle')}
               </h2>
               <button
                 onClick={onClose}
@@ -131,7 +133,7 @@ const GoldPriceFormModal: React.FC<GoldPriceFormModalProps> = ({
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Karat <span className="text-red-500">*</span>
+                  {t('admin.goldPrices.form.karat')} <span className="text-red-500">*</span>
                 </label>
                 {karatsLoading ? (
                   <div className="flex items-center justify-center p-8 bg-gray-50 rounded-xl">
@@ -145,7 +147,7 @@ const GoldPriceFormModal: React.FC<GoldPriceFormModalProps> = ({
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                     required
                   >
-                    <option value="">Select Karat</option>
+                    <option value="">{t('admin.goldPrices.form.selectKarat')}</option>
                     {karats.map((karat) => (
                       <option key={karat.id} value={karat.name}>
                         {karat.displayName}
@@ -157,13 +159,13 @@ const GoldPriceFormModal: React.FC<GoldPriceFormModalProps> = ({
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Price per Gram ($) <span className="text-red-500">*</span>
+                  {t('admin.goldPrices.form.price')}<span className="text-red-500">*</span>
                 </label>
                 <input
                   type="number"
                   step="0.001"
                   min="0"
-                  placeholder='price per (g)'
+                  placeholder={t('admin.goldPrices.form.pricePlaceholder')}
                   value={formData.pricePerGram}
                   onChange={(e) => setFormData({ ...formData, pricePerGram: e.target.value })}
                   disabled={loading}
@@ -174,7 +176,7 @@ const GoldPriceFormModal: React.FC<GoldPriceFormModalProps> = ({
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Effective Date <span className="text-red-500">*</span>
+                  {t('admin.goldPrices.form.date')} <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="date"
@@ -186,18 +188,19 @@ const GoldPriceFormModal: React.FC<GoldPriceFormModalProps> = ({
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-3">Status</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-3">{t('admin.goldPrices.form.status')}</label>
                 <label className="relative inline-flex items-center cursor-pointer">
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     checked={formData.isActive}
                     onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                     disabled={loading}
                     className="sr-only peer"
                   />
-                  <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"></div>
-                  <span className="ml-3 text-sm font-medium text-gray-900">
-                    {formData.isActive ? 'Active' : 'Inactive'}
+                  <div
+                    className="w-14 h-7 bg-gray-200 rounded-full relative peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border after:border-gray-300 after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-blue-600 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full"></div>
+                  <span className="ms-3 text-sm font-medium text-gray-900 whitespace-nowrap">
+                    {formData.isActive ? t('admin.goldPrices.status.active') : t('admin.goldPrices.status.inactive')}
                   </span>
                 </label>
               </div>
@@ -217,12 +220,12 @@ const GoldPriceFormModal: React.FC<GoldPriceFormModalProps> = ({
                   {loading ? (
                     <>
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                      Saving...
+                      {t('admin.goldPrices.form.saving')}
                     </>
                   ) : editingGoldPrice ? (
-                    'Update Price'
+                    t('admin.goldPrices.form.update')
                   ) : (
-                    'Create Price'
+                    t('admin.goldPrices.form.create')
                   )}
                 </button>
                 <button
@@ -231,7 +234,7 @@ const GoldPriceFormModal: React.FC<GoldPriceFormModalProps> = ({
                   disabled={loading}
                   className="flex-1 py-2 px-4 rounded-xl text-lg font-bold border border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Cancel
+                  {t('admin.goldPrices.actions.cancel')}
                 </button>
               </div>
             </form>

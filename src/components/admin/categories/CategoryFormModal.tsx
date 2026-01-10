@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import type { AdminCategory } from '../../../services/adminApi';
 import { adminCreateCategory, adminUpdateCategory } from '../../../services/adminApi';
 import { useToast } from '../../../contexts/ToastContext';
+import { useTranslation } from 'react-i18next';
 
 interface CategoryFormData {
   name: string;
@@ -34,6 +35,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { addToast } = useToast();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (editingCategory) {
@@ -61,7 +63,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.description.trim()) {
-      setError('Please fill all required fields');
+      setError(t('admin.categories.form.requiredError'));
       return;
     }
     try {
@@ -75,10 +77,10 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
       };
       if (editingCategory) {
         await adminUpdateCategory(editingCategory.id, payload);
-        addToast(`"${payload.name}" updated successfully`, 'success');
+        addToast(t('admin.categories.form.updateSuccess', { name: payload.name }), 'success');
       } else {
         await adminCreateCategory(payload);
-        addToast(`"${payload.name}" created successfully`, 'success');
+        addToast(t('admin.categories.form.createSuccess', { name: payload.name }), 'success');
       }
       onClose();
       await onSubmitSuccess(page);
@@ -101,7 +103,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">
-                {editingCategory ? 'Edit Category' : 'New Category'}
+                {editingCategory ? t('admin.categories.editTitle') : t('admin.categories.newTitle')}
               </h2>
               <button
                 onClick={onClose}
@@ -116,7 +118,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Category Name <span className="text-red-500">*</span>
+                  {t('admin.categories.fields.name')} <span className="text-red-500">*</span>
                 </label>
                 <input
                   value={formData.name}
@@ -128,7 +130,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Category Name (Arabic) <span className="text-red-500">*</span>
+                  {t('admin.categories.fields.arabicName')} <span className="text-red-500">*</span>
                 </label>
                 <input
                   value={formData.arabicName}
@@ -144,7 +146,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Description <span className="text-red-500">*</span>
+                  {t('admin.categories.fields.description')} <span className="text-red-500">*</span>
                 </label>
                 <input
                   value={formData.description}
@@ -156,7 +158,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Description (Arabic) <span className="text-red-500">*</span>
+                  {t('admin.categories.fields.arabicDescription')} <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   value={formData.arabicDescription}
@@ -188,12 +190,12 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                   {loading ? (
                     <>
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                      Saving...
+                      {t('admin.categories.form.saving')}
                     </>
                   ) : editingCategory ? (
-                    'Update Category'
+                   t('admin.categories.form.update')
                   ) : (
-                    'Create Category'
+                    t('admin.categories.form.create')
                   )}
                 </button>
                 <button
@@ -202,7 +204,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({
                   disabled={loading}
                   className="flex-1 py-2 px-4 rounded-xl text-lg font-bold border border-gray-300 bg-white hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Cancel
+                  {t('admin.categories.actions.cancel')}
                 </button>
               </div>
             </form>

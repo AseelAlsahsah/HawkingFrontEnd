@@ -1,7 +1,8 @@
-// src/components/admin/LoginForm.tsx
 import React, { useState, type FormEvent, useEffect } from 'react';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../LanguageSwitcher';
 
 interface FormData {
   username: string;
@@ -12,6 +13,7 @@ const LoginForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({ username: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
   const { login, token, user, loading: authLoading } = useAdminAuth();
   const navigate = useNavigate();
@@ -27,7 +29,7 @@ const LoginForm: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="w-12 h-12 mx-auto bg-gray-200 rounded-xl animate-pulse mb-4" />
-          <p className="text-gray-700 font-semibold">Loading…</p>
+          <p className="text-gray-700 font-semibold">{t('admin.loading')}</p>
         </div>
       </div>
     );
@@ -43,10 +45,10 @@ const LoginForm: React.FC = () => {
       if (result.success) {
         navigate('/admin/dashboard', { replace: true });
       } else {
-        setError(result.error || 'Invalid credentials');
+        setError(result.error || t('admin.invalidCredentials'));
       }
     } catch {
-      setError('Login failed. Please try again.');
+      setError(t('admin.loginFailed'));
     } finally {
       setLoading(false);
     }
@@ -57,11 +59,16 @@ const LoginForm: React.FC = () => {
       <div className="w-full max-w-md">
         {/* Card */}
         <div className="bg-white border border-gray-200 rounded-xl shadow-lg p-8">
+          {/* Language Switcher */}
+          <div className="absolute top-4 end-4">
+            <LanguageSwitcher />
+          </div>
+
           {/* Header */}
           <div className="mb-8 text-center">
-            <h1 className="text-3xl font-bold text-gray-900">Admin Login</h1>
+            <h1 className="text-3xl font-bold text-gray-900">{t('admin.loginTitle')}</h1>
             <p className="text-sm text-gray-500 mt-2">
-              Sign in to manage the system
+              {t('admin.loginSubtitle')}
             </p>
           </div>
 
@@ -76,7 +83,7 @@ const LoginForm: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Username
+                {t('admin.username')}
               </label>
               <input
                 type="text"
@@ -85,7 +92,8 @@ const LoginForm: React.FC = () => {
                   setFormData({ ...formData, username: e.target.value })
                 }
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition"
-                placeholder="Enter your username"
+                dir="ltr"
+                placeholder={t('admin.usernamePlaceholder')}
                 disabled={loading}
                 autoComplete="username"
                 required
@@ -94,7 +102,7 @@ const LoginForm: React.FC = () => {
 
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Password
+                {t('admin.password')}
               </label>
               <input
                 type="password"
@@ -103,7 +111,8 @@ const LoginForm: React.FC = () => {
                   setFormData({ ...formData, password: e.target.value })
                 }
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition"
-                placeholder="Enter your password"
+                dir="ltr"
+                placeholder={t('admin.passwordPlaceholder')}
                 disabled={loading}
                 autoComplete="current-password"
                 required
@@ -115,7 +124,7 @@ const LoginForm: React.FC = () => {
               disabled={loading}
               className="w-full bg-amber-600 hover:bg-amber-700 text-white py-3 rounded-lg font-bold text-lg transition disabled:opacity-50"
             >
-              {loading ? 'Signing in…' : 'Sign in'}
+              {loading ? t('admin.signingIn') : t('admin.signIn')}
             </button>
           </form>
         </div>
@@ -126,7 +135,7 @@ const LoginForm: React.FC = () => {
             to="/admin/register"
             className="text-sm font-semibold text-amber-600 hover:text-amber-700"
           >
-            Create new admin account →
+            {t('admin.goToRegister')}
           </Link>
         </div>
       </div>

@@ -1,16 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
+import {
   adminFetchGoldPrices,
   type AdminGoldPrice
 } from '../../../services/adminApi';
 import GoldPriceFormModal from './GoldPriceFormModal';
 import GoldPriceActions from './GoldPriceActions';
 import Pagination from '../../Pagination';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../LanguageSwitcher';
 
 const GoldPricesManagement: React.FC = () => {
   const navigate = useNavigate();
-
   const [goldPrices, setGoldPrices] = useState<AdminGoldPrice[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -18,6 +19,7 @@ const GoldPricesManagement: React.FC = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [showForm, setShowForm] = useState(false);
   const [editingGoldPrice, setEditingGoldPrice] = useState<AdminGoldPrice | null>(null);
+  const { t } = useTranslation();
 
   const getErrorMessage = (err: any, fallback = 'Something went wrong') => {
     return (
@@ -75,8 +77,8 @@ const GoldPricesManagement: React.FC = () => {
           <div className="w-16 h-16 mx-auto bg-gradient-to-br from-gray-200 to-gray-300 rounded-2xl flex items-center justify-center mb-6 shadow-lg animate-pulse">
             <div className="w-8 h-8 bg-white rounded-xl"></div>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Loading Gold Prices...</h2>
-          <p className="text-gray-600">Fetching daily gold prices</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('admin.goldPrices.loadingTitle')}</h2>
+          <p className="text-gray-600">{t('admin.goldPrices.loadingSubtitle')}</p>
         </div>
       </div>
     );
@@ -90,10 +92,10 @@ const GoldPricesManagement: React.FC = () => {
             <div className="flex items-center gap-4">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">
-                  Gold Price Management
+                  {t('admin.goldPrices.title')}
                 </h1>
                 <p className="mt-1 text-sm text-gray-600 font-medium">
-                  Manage daily gold prices per karat
+                  {t('admin.goldPrices.subtitle')}
                 </p>
               </div>
             </div>
@@ -105,14 +107,15 @@ const GoldPricesManagement: React.FC = () => {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
-                Dashboard
+                {t('common.backToDashboard')}
               </button>
               <button
                 onClick={handleNewGoldPrice}
                 className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold rounded-xl shadow-xl transition-all duration-300 flex items-center gap-2"
               >
-              Add New Price
+                {t('admin.goldPrices.addNew')}
               </button>
+              <LanguageSwitcher />
             </div>
           </div>
         </div>
@@ -130,15 +133,15 @@ const GoldPricesManagement: React.FC = () => {
             <div className="w-24 h-24 mx-auto bg-gradient-to-br from-gray-200 to-gray-300 rounded-3xl flex items-center justify-center mb-6">
               <span className="text-3xl text-gray-400">💰</span>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">No gold prices found</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('admin.goldPrices.emptyTitle')}</h3>
             <p className="text-gray-600 mb-8 max-w-md mx-auto">
-              Add gold prices for different karats and dates to get started
+              {t('admin.goldPrices.emptySubtitle')}
             </p>
             <button
               onClick={handleNewGoldPrice}
               className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold rounded-2xl hover:shadow-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300 mx-auto"
             >
-              Add First Price
+              {t('admin.goldPrices.addFirst')}
             </button>
           </div>
         ) : (
@@ -147,11 +150,11 @@ const GoldPricesManagement: React.FC = () => {
               <table className="w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Karat</th>
-                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Price/Gram</th>
-                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Date</th>
-                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Actions</th>
+                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">{t('admin.goldPrices.table.karat')}</th>
+                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">{t('admin.goldPrices.table.price')}</th>
+                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">{t('admin.goldPrices.table.date')}</th>
+                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">{t('admin.goldPrices.table.status')}</th>
+                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">{t('admin.goldPrices.table.actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -173,16 +176,15 @@ const GoldPricesManagement: React.FC = () => {
                         </p>
                       </td>
                       <td className="px-6 py-6 text-center">
-                        <span className={`inline-flex px-3 py-1 text-xs font-bold rounded-full shadow-sm ${
-                          goldPrice.isActive 
-                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' 
-                            : 'bg-red-100 text-red-800 border border-red-200'
-                        }`}>
-                          {goldPrice.isActive ? 'Active' : 'Inactive'}
+                        <span className={`inline-flex px-3 py-1 text-xs font-bold rounded-full shadow-sm ${goldPrice.isActive
+                          ? 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                          : 'bg-red-100 text-red-800 border border-red-200'
+                          }`}>
+                          {goldPrice.isActive ? t('admin.goldPrices.status.active') : t('admin.goldPrices.status.inactive')}
                         </span>
                       </td>
                       <td className="px-6 py-6 text-center">
-                        <GoldPriceActions 
+                        <GoldPriceActions
                           goldPrice={goldPrice}
                           onEdit={handleEdit}
                           fetchGoldPrices={fetchGoldPrices}

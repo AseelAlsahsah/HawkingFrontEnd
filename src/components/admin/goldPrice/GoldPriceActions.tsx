@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import type { AdminGoldPrice } from '../../../services/adminApi';
 import { adminDeleteGoldPrice } from '../../../services/adminApi';
 import { useToast } from '../../../contexts/ToastContext';
+import { useTranslation } from 'react-i18next';
 
 interface GoldPriceActionsProps {
   goldPrice: AdminGoldPrice;
@@ -21,6 +22,7 @@ const GoldPriceActions: React.FC<GoldPriceActionsProps> = ({
   const { addToast } = useToast();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const { t } = useTranslation();
 
   const getErrorMessage = (err: any, fallback = 'Something went wrong') => {
     return (
@@ -35,11 +37,11 @@ const GoldPriceActions: React.FC<GoldPriceActionsProps> = ({
     setDeleting(true);
     try {
       await adminDeleteGoldPrice(goldPrice.id);
-      addToast('Gold price deleted successfully!', 'success');
+      addToast(t('admin.goldPrices.actions.deleteSuccess'), 'success');
       await fetchGoldPrices(page);
     } catch (err: any) {
-      setError(getErrorMessage(err, 'Failed to delete gold price'));
-      addToast(getErrorMessage(err, 'Failed to delete gold price'), 'error');
+      setError(getErrorMessage(err, t('admin.goldPrices.actions.deleteFailed')));
+      addToast(getErrorMessage(err, t('admin.goldPrices.actions.deleteFailed')), 'error');
     } finally {
       setDeleting(false);
       setShowDeleteModal(false);
@@ -61,7 +63,7 @@ const GoldPriceActions: React.FC<GoldPriceActionsProps> = ({
             </svg>
           </button>
           <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 opacity-0 invisible group-hover/edit:opacity-100 group-hover/edit:visible group-hover/edit:scale-100 transition-all duration-200 ease-out bg-yellow-900/95 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-xl border border-yellow-800/50 whitespace-nowrap z-20 after:absolute after:-bottom-1 after:left-1/2 after:transform after:-translate-x-1/2 after:w-0 after:h-0 after:border-l-[6px] after:border-l-transparent after:border-r-[6px] after:border-r-transparent after:border-t-[6px] after:border-t-yellow-900/95">
-            Edit Price
+            {t('admin.goldPrices.actions.edit')}
           </div>
         </div>
 
@@ -78,56 +80,56 @@ const GoldPriceActions: React.FC<GoldPriceActionsProps> = ({
             </svg>
           </button>
           <div className="absolute -top-10 left-1/2 transform -translate-x-1/2 opacity-0 invisible group-hover/delete:opacity-100 group-hover/delete:visible group-hover/delete:scale-100 transition-all duration-200 ease-out bg-red-900/95 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-xl border border-red-800/50 whitespace-nowrap z-20 after:absolute after:-bottom-1 after:left-1/2 after:transform after:-translate-x-1/2 after:w-0 after:h-0 after:border-l-[6px] after:border-l-transparent after:border-r-[6px] after:border-r-transparent after:border-t-[6px] after:border-t-red-900/95">
-            Delete Price
+            {t('admin.goldPrices.actions.delete')}
           </div>
         </div>
       </div>
 
       {/* DELETE CONFIRMATION MODAL */}
       {showDeleteModal && (
-      <div className="fixed inset-0 bg-black/10 flex items-center justify-center z-50 p-4 animate-in fade-in zoom-in duration-200">
+        <div className="fixed inset-0 bg-black/10 flex items-center justify-center z-50 p-4 animate-in fade-in zoom-in duration-200">
           <div className="bg-white/95 rounded-xl shadow-2xl max-w-md w-full mx-4 border border-gray-200 animate-in slide-in-from-bottom-4 duration-300">
-          <div className="p-8 text-center">
+            <div className="p-8 text-center">
               <div className="w-20 h-20 mx-auto bg-white rounded-xl flex items-center justify-center">
-              <svg className="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-              </svg>
+                </svg>
               </div>
               <h3 className="text-lg font-black text-gray-900 mb-3">
-                This will permanently remove the price for{' '}
-                <span className="font-semibold text-amber-600">{goldPrice.karat.displayName}</span> on{' '}
-                <span className="font-semibold">{new Date(goldPrice.effectiveDate).toLocaleDateString()}</span>.
+                {t('admin.goldPrices.actions.confirmTitle', {
+                  karat: goldPrice.karat.displayName,
+                  date: new Date(goldPrice.effectiveDate).toLocaleDateString()
+                })}
               </h3>
               <p className="text-sm text-gray-500 mb-8 leading-relaxed">
-              This action <span className="font-bold text-red-600">CANNOT</span> be undone. 
-              It will be permanently removed from your system.
+                {t('admin.goldPrices.actions.confirmText')}
               </p>
               <div className="flex gap-4">
                 <button
-                    onClick={() => setShowDeleteModal(false)}
-                    disabled={deleting}
-                    className="flex-1 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-900 font-bold py-1 px-4 rounded-xl text-lg border border-gray-300"
+                  onClick={() => setShowDeleteModal(false)}
+                  disabled={deleting}
+                  className="flex-1 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-900 font-bold py-1 px-4 rounded-xl text-lg border border-gray-300"
                 >
-                    Cancel
+                  {t('admin.goldPrices.actions.cancel')}
                 </button>
                 <button
-                    onClick={handleDelete}
-                    disabled={deleting}
-                    className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-4 rounded-xl text-lg border border-red-600/50"
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-1 px-4 rounded-xl text-lg border border-red-600/50"
                 >
-                {deleting ? (
+                  {deleting ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      Deleting...
+                      {t('admin.goldPrices.actions.deleting')}
                     </>
                   ) : (
-                    'Delete Price'
+                    t('admin.goldPrices.actions.confirmDelete')
                   )}
                 </button>
               </div>
+            </div>
           </div>
-          </div>
-      </div>
+        </div>
       )}
     </>
   );

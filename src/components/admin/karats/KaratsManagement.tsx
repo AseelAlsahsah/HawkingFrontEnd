@@ -1,15 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
+import {
   adminFetchKarats
 } from '../../../services/api';
 import type { AdminKarat } from '../../../services/api';
 import KaratFormModal from './KaratFormModal';
 import KaratActions from './KaratActions';
-import { useNavigate } from 'react-router-dom';  
+import { useNavigate } from 'react-router-dom';
 import Pagination from '../../Pagination';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../LanguageSwitcher';
 
 const KaratsManagement: React.FC = () => {
-  const navigate = useNavigate();  
+  const navigate = useNavigate();
 
   const [karats, setKarats] = useState<AdminKarat[]>([]);
   const [loading, setLoading] = useState(true);
@@ -18,6 +20,7 @@ const KaratsManagement: React.FC = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [showForm, setShowForm] = useState(false);
   const [editingKarat, setEditingKarat] = useState<AdminKarat | null>(null);
+  const { t } = useTranslation();
 
   const getErrorMessage = (err: any, fallback = 'Something went wrong') => {
     return (
@@ -76,8 +79,8 @@ const KaratsManagement: React.FC = () => {
           <div className="w-16 h-16 mx-auto bg-gradient-to-br from-gray-200 to-gray-300 rounded-2xl flex items-center justify-center mb-6 shadow-lg animate-pulse">
             <div className="w-8 h-8 bg-white rounded-xl"></div>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Loading Karats...</h2>
-          <p className="text-gray-600">Fetching gold karat types</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('admin.karats.loadingTitle')}</h2>
+          <p className="text-gray-600">{t('admin.karats.loadingSubtitle')}</p>
         </div>
       </div>
     );
@@ -92,29 +95,30 @@ const KaratsManagement: React.FC = () => {
             <div className="flex items-center gap-4">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 ">
-                  Karat Management
+                  {t('admin.karats.title')}
                 </h1>
                 <p className="mt-1 text-sm text-gray-600 font-medium">
-                  Manage gold karat types
+                  {t('admin.karats.subtitle')}
                 </p>
               </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-3">
               <button
-                onClick={() => navigate('/admin/dashboard')} 
+                onClick={() => navigate('/admin/dashboard')}
                 className="px-4 py-2 text-sm font-semibold text-gray-800 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 rounded-xl border border-gray-200 shadow-sm flex items-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
-                Dashboard
+                {t('common.backToDashboard')}
               </button>
               <button
                 onClick={handleNewKarat}
                 className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold rounded-xl shadow-xl transition-all duration-300 flex items-center gap-2"
-                >
-                Add New Karat
+              >
+                {t('admin.karats.addNew')}
               </button>
+              <LanguageSwitcher />
             </div>
           </div>
         </div>
@@ -134,15 +138,15 @@ const KaratsManagement: React.FC = () => {
             <div className="w-24 h-24 mx-auto bg-gradient-to-br from-gray-200 to-gray-300 rounded-3xl flex items-center justify-center mb-6">
               <span className="text-3xl text-gray-400">⭐</span>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">No karats found</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('admin.karats.emptyTitle')}</h3>
             <p className="text-gray-600 mb-8 max-w-md mx-auto">
-              Add karat types like 18K, 21K, 24K to manage your gold inventory
+              {t('admin.karats.emptySubtitle')}
             </p>
             <button
               onClick={handleNewKarat}
               className="px-8 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold rounded-2xl hover:shadow-xl hover:from-emerald-600 hover:to-emerald-700 transition-all duration-300 mx-auto"
             >
-            Add First Karat
+              {t('admin.karats.addFirst')}
             </button>
           </div>
         ) : (
@@ -152,9 +156,9 @@ const KaratsManagement: React.FC = () => {
               <table className="w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Name</th>
-                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Display Name</th>
-                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Actions</th>
+                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">{t('admin.karats.table.name')}</th>
+                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">{t('admin.karats.table.displayName')}</th>
+                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">{t('admin.karats.table.actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -169,7 +173,7 @@ const KaratsManagement: React.FC = () => {
                         <p className="font-semibold text-gray-900">{karat.displayName}</p>
                       </td>
                       <td className="px-6 py-6 text-center">
-                        <KaratActions 
+                        <KaratActions
                           karat={karat}
                           onEdit={handleEdit}
                           fetchKarats={fetchKarats}

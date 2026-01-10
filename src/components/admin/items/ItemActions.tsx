@@ -1,7 +1,7 @@
-// src/components/admin/items/ItemActions.tsx
 import React from 'react';
 import type { AdminItem } from '../../../services/adminApi';
 import { adminDeactivateItem, adminDeleteItem  } from '../../../services/adminApi';
+import { useTranslation } from 'react-i18next';
 
 interface ItemActionsProps {
   item: AdminItem;
@@ -24,6 +24,7 @@ const ItemActions: React.FC<ItemActionsProps> = ({
   const [deleting, setDeleting] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+  const { t } = useTranslation();
 
   const getErrorMessage = (err: any, fallback = 'Something went wrong') => {
     return (
@@ -99,7 +100,7 @@ const ItemActions: React.FC<ItemActionsProps> = ({
               }}
               className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
             >
-              ✏️ Edit
+              {t('common.edit')}
             </button>
 
             <button
@@ -110,7 +111,7 @@ const ItemActions: React.FC<ItemActionsProps> = ({
               disabled={deactivating}
               className="w-full px-4 py-2.5 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 disabled:opacity-50"
             >
-              ⛔ Deactivate
+              {t('common.deactivate')}
             </button>
 
             <button
@@ -121,7 +122,7 @@ const ItemActions: React.FC<ItemActionsProps> = ({
               disabled={deleting}
               className="w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 disabled:opacity-50"
             >
-              🗑 Delete
+              {t('common.delete')}
             </button>
           </div>
         )}

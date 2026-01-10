@@ -15,6 +15,8 @@ import Pagination from '../../Pagination';
 import DiscountFormModal from './DiscountFormModal';
 import DiscountItemsModal from './DiscountItemsModal';
 import DeleteDiscountModal from './DeleteDiscountModal';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../LanguageSwitcher';
 
 /* ===================== FORMATTERS ===================== */
 const formatDateTime = (value: string) =>
@@ -38,6 +40,7 @@ interface DiscountFormState {
 
 const DiscountsManagement: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   /* ---------- DATA ---------- */
   const [discounts, setDiscounts] = useState<AdminDiscount[]>([]);
@@ -116,7 +119,7 @@ const DiscountsManagement: React.FC = () => {
     e.preventDefault();
     const percentage = parseFloat(formState.percentage);
     if (Number.isNaN(percentage) || percentage <= 0) {
-      setFormError('Percentage must be a positive number');
+      setFormError(t('admin.discounts.errors.invalidPercentage'));
       return;
     }
     try {
@@ -181,7 +184,7 @@ const DiscountsManagement: React.FC = () => {
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-amber-50 flex items-center justify-center">
         <div className="bg-white/80 backdrop-blur-sm px-8 py-6 rounded-2xl shadow-xl border border-gray-200 flex items-center gap-3">
           <div className="w-5 h-5 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
-          Loading discounts…
+          {t('admin.discounts.loading')}
         </div>
       </div>
     );
@@ -192,9 +195,9 @@ const DiscountsManagement: React.FC = () => {
       <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Discounts Management</h1>
+            <h1 className="text-3xl font-bold text-gray-900">{t('admin.discounts.title')}</h1>
             <p className="text-sm text-gray-500 font-medium">
-              Manage discounts and their assigned items
+              {t('admin.discounts.subtitle')}
             </p>
           </div>
           <div className="flex flex-col sm:flex-row gap-3">
@@ -205,14 +208,15 @@ const DiscountsManagement: React.FC = () => {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              Dashboard
+              {t('common.backToDashboard')}
             </button>
             <button
               onClick={openCreateModal}
               className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold rounded-xl shadow-xl transition-all duration-300 flex items-center gap-2"
             >
-              Add New Discount
+              {t('admin.discounts.addNew')}
             </button>
+            <LanguageSwitcher />
           </div>
         </div>
       </header>
@@ -227,7 +231,7 @@ const DiscountsManagement: React.FC = () => {
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="px-6 py-5 border-b border-gray-100 bg-gray-50">
             <h3 className="text-lg font-bold text-gray-900">
-              All Discounts ({pageMeta?.totalElements ?? 0})
+              {t('admin.discounts.all', { count: pageMeta?.totalElements ?? 0 })}
             </h3>
           </div>
 
@@ -235,12 +239,12 @@ const DiscountsManagement: React.FC = () => {
             <table className="w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">Percentage</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">Start Date</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">End Date</th>
-                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase">Status</th>
-                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase">Items Count</th>
-                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase">Actions</th>
+                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase">{t('admin.discounts.percentage')}</th>
+                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase">{t('admin.discounts.startDate')}</th>
+                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase">{t('admin.discounts.endDate')}</th>
+                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase">{t('admin.discounts.endDate')}</th>
+                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase">{t('admin.discounts.itemsCount')}</th>
+                  <th className="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase">{t('common.actions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 bg-white">
@@ -259,12 +263,12 @@ const DiscountsManagement: React.FC = () => {
                       {d.isActive ? (
                         <span className="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full
                                             bg-emerald-50 text-emerald-700 border border-emerald-200">
-                          Active
+                          {t('common.active')}
                         </span>
                       ) : (
                         <span className="inline-flex items-center gap-1 px-3 py-1 text-xs font-semibold rounded-full
                                             bg-gray-100 text-gray-600 border border-gray-300">
-                          Inactive
+                          {t('common.inactive')}
                         </span>
                       )}
                     </td>
@@ -279,31 +283,31 @@ const DiscountsManagement: React.FC = () => {
                           onClick={() => openEditModal(d)}
                           className="px-2 py-1 text-xs font-semibold bg-white border border-gray-300 rounded-lg hover:bg-gray-50 shadow-sm"
                         >
-                          Edit
+                          {t('common.edit')}
                         </button>
                         <button
                           onClick={() => setViewItemsDiscount(d)}
                           className="px-1 py-1 text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200 rounded-lg hover:bg-sky-100 shadow-sm"
                         >
-                          View Items
+                          {t('admin.discounts.viewItems')}
                         </button>
                         <button
                           onClick={() => openItemsModal(d, 'add')}
                           className={"px-1 py-1 text-xs font-semibold rounded-lg border shadow-sm bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100"}
                         >
-                          Add Items
+                          {t('admin.discounts.addItems')}
                         </button>
                         <button
                           onClick={() => openItemsModal(d, 'remove')}
                           className="px-1 py-1 text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 rounded-lg hover:bg-amber-100 shadow-sm"
                         >
-                          Remove Items
+                          {t('admin.discounts.removeItems')}
                         </button>
                         <button
                           onClick={() => setDeleteTarget(d)}
                           className="px-1 py-1 text-xs font-semibold bg-red-50 text-red-700 border border-red-200 rounded-lg hover:bg-red-100 shadow-sm"
                         >
-                          Delete
+                          {t('common.delete')}
                         </button>
                       </div>
                     </td>

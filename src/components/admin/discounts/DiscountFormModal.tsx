@@ -1,5 +1,6 @@
 import React from 'react';
 import type { AdminDiscount } from '../../../services/adminApi';
+import { useTranslation } from 'react-i18next';
 
 interface DiscountFormState {
     percentage: string;
@@ -28,13 +29,14 @@ const DiscountFormModal: React.FC<DiscountFormModalProps> = ({
     onClose,
 }) => {
     if (!open) return null;
+    const { t } = useTranslation();
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg border border-gray-200">
                 <div className="px-6 py-4 border-b border-gray-100 flex justify-between">
                     <h3 className="text-2xl font-bold">
-                        {editingDiscount ? 'Edit Discount' : 'New Discount'}
+                        {editingDiscount ? t('admin.discounts.form.editTitle') : t('admin.discounts.form.newTitle')}
                     </h3>
                     <button onClick={onClose}>✕</button>
                 </div>
@@ -47,18 +49,18 @@ const DiscountFormModal: React.FC<DiscountFormModalProps> = ({
                     )}
 
                     <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Discount Percentage *</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">{t('admin.discounts.form.percentage')} *</label>
                         <input
                             value={formState.percentage}
                             type="number"
                             onChange={e => onChange({ ...formState, percentage: e.target.value })}
                             className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all duration-200 bg-white shadow-sm hover:shadow-md"
-                            placeholder="Discount %"
+                            placeholder={t('admin.discounts.form.percentagePlaceholder')}
                             required
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Start Date *</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">{t('admin.discounts.form.startDate')} *</label>
                         <input
                             type="datetime-local"
                             value={formState.startDate}
@@ -68,7 +70,7 @@ const DiscountFormModal: React.FC<DiscountFormModalProps> = ({
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">End Date *</label>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">{t('admin.discounts.form.startDate')} *</label>
                         <input
                             type="datetime-local"
                             value={formState.endDate}
@@ -81,12 +83,12 @@ const DiscountFormModal: React.FC<DiscountFormModalProps> = ({
                     <div className="flex items-center justify-between pt-2">
                         <div>
                             <p className="text-sm font-semibold text-gray-900">
-                                Discount Status
+                                {t('admin.discounts.form.status')}
                             </p>
                             <p className="text-xs text-gray-500">
                                 {formState.isActive
-                                    ? 'Discount is active and can be applied'
-                                    : 'Discount is inactive and will not apply'}
+                                    ? t('admin.discounts.form.activeHelp')
+                                    : t('admin.discounts.form.inactiveHelp')}
                             </p>
                         </div>
 
@@ -101,7 +103,9 @@ const DiscountFormModal: React.FC<DiscountFormModalProps> = ({
                         >
                             <span
                                 className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform
-                        ${formState.isActive ? 'translate-x-5' : 'translate-x-1'}
+                        ${formState.isActive
+                            ? 'ltr:translate-x-5 rtl:-translate-x-5'
+                            : 'ltr:translate-x-1 rtl:-translate-x-1'}
                     `}
                             />
                         </button>
@@ -109,10 +113,10 @@ const DiscountFormModal: React.FC<DiscountFormModalProps> = ({
 
                     <div className="flex justify-end gap-3 pt-4">
                         <button type="button" onClick={onClose} className="px-4 py-2 bg-gray-100 rounded-lg">
-                            Cancel
+                            {t('common.cancel')}
                         </button>
                         <button type="submit" className="px-4 py-2 bg-emerald-600 text-white rounded-lg">
-                            Save
+                            {t('common.save')}
                         </button>
                     </div>
                 </form>

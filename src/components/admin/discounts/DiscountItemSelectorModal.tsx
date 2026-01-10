@@ -1,10 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { searchItemsByCode } from '../../../services/api';
+import { useTranslation } from 'react-i18next';
+import { pickLang } from '../../../utils/i18nHelpers';
 
 interface Item {
   id: number;
   code: string;
   name: string;
+  arabicName: string;
   imageUrl?: string;
   category?: { name: string };
   karat?: { displayName: string };
@@ -33,8 +36,7 @@ const DiscountItemSelectorModal: React.FC<Props> = ({
   const [selectedItems, setSelectedItems] = useState<Record<string, Item>>({});
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-
-  /* ------------------------------- FETCH LOGIC ------------------------------- */
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!open) return;
@@ -43,12 +45,10 @@ const DiscountItemSelectorModal: React.FC<Props> = ({
       setResults(existingItems);
       return;
     }
-
     if (!query.trim()) {
-      setResults([]); // 👈 allowed now, selected items still render
+      setResults([]);
       return;
     }
-
     const timeout = setTimeout(async () => {
       setLoading(true);
       try {
@@ -58,11 +58,8 @@ const DiscountItemSelectorModal: React.FC<Props> = ({
         setLoading(false);
       }
     }, 300);
-
     return () => clearTimeout(timeout);
   }, [query, mode, existingItems, open]);
-
-  /* ---------------------------- SELECTION HANDLING --------------------------- */
 
   const toggleSelect = (item: Item) => {
     setSelectedCodes(prev =>
@@ -94,8 +91,6 @@ const DiscountItemSelectorModal: React.FC<Props> = ({
     }
   };
 
-  /* -------------------------- MERGED DISPLAY LIST ---------------------------- */
-
   const displayItems = useMemo(() => {
     const selectedList = Object.values(selectedItems);
     const selectedSet = new Set(selectedCodes);
@@ -123,8 +118,8 @@ const DiscountItemSelectorModal: React.FC<Props> = ({
         <div className="px-6 py-4 border-b border-gray-100 flex justify-between">
           <h3 className="text-lg font-semibold">
             {mode === 'add'
-              ? 'Add Items to Discount'
-              : 'Remove Items from Discount'}
+              ? t('admin.discounts.selector.addTitle')
+              : t('admin.discounts.selector.removeTitle')}
           </h3>
           <button
             onClick={() => {
@@ -142,7 +137,7 @@ const DiscountItemSelectorModal: React.FC<Props> = ({
             <input
               value={query}
               onChange={e => setQuery(e.target.value)}
-              placeholder="Search by item code…"
+              placeholder={t('admin.discounts.selector.search')}
               className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-amber-500 focus:ring-amber-500"
             />
           </div>
@@ -150,15 +145,15 @@ const DiscountItemSelectorModal: React.FC<Props> = ({
 
         {/* Items */}
         <div className="px-6 py-4 max-h-[420px] overflow-y-auto space-y-2">
-          {loading && <p className="text-sm text-gray-500">Searching…</p>}
+          {loading && <p className="text-sm text-gray-500">{t('common.searching')}</p>}
 
           {!loading && displayItems.length === 0 && (
-            <p className="text-sm text-gray-500">No items found.</p>
+            <p className="text-sm text-gray-500">{t('admin.discounts.selector.noResults')}</p>
           )}
 
           {selectedCodes.length > 0 && (
             <div className="text-xs text-gray-500 font-semibold mt-2 mb-1">
-              Selected items
+              {t('admin.discounts.selector.selected')}
             </div>
           )}
 
@@ -183,14 +178,14 @@ const DiscountItemSelectorModal: React.FC<Props> = ({
                   onChange={() => toggleSelect(item)}
                 />
                 <div className="flex-1">
-                  <p className="text-sm font-semibold">{item.name}</p>
+                  <p className="text-sm font-semibold">{pickLang(item.name, item.arabicName)}</p>
                   <p className="text-xs text-gray-500 font-mono">
                     {item.code}
                   </p>
                 </div>
                 {disabled && (
                   <span className="text-xs text-amber-600 font-semibold">
-                    Already added
+                    {t('admin.discounts.selector.alreadyAdded')}
                   </span>
                 )}
               </label>
@@ -207,7 +202,7 @@ const DiscountItemSelectorModal: React.FC<Props> = ({
             }}
             className="px-4 py-2 text-sm bg-gray-100 rounded-lg"
           >
-            Cancel
+            {t('common.cancel')}
           </button>
           <button
             disabled={selectedCodes.length === 0 || submitting}
@@ -215,8 +210,8 @@ const DiscountItemSelectorModal: React.FC<Props> = ({
             className="px-4 py-2 text-sm font-semibold text-white rounded-lg bg-gradient-to-r from-emerald-500 to-emerald-600 disabled:opacity-50"
           >
             {mode === 'add'
-              ? `Add ${selectedCodes.length} item(s)`
-              : `Remove ${selectedCodes.length} item(s)`}
+              ? t('admin.discounts.selector.addCount', { count: selectedCodes.length })
+              : t('admin.discounts.selector.removeCount', { count: selectedCodes.length })}
           </button>
         </div>
       </div>

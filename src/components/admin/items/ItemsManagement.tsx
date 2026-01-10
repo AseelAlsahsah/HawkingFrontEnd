@@ -2,22 +2,25 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { adminFetchCategories } from '../../../services/api';
 import { adminFetchItems, adminGetItemByCode } from '../../../services/adminApi';
 import type { Item, AdminCategory } from '../../../services/api';
-import type { AdminItem} from '../../../services/adminApi';
+import type { AdminItem } from '../../../services/adminApi';
 import AdminSearchBar from '../AdminSearchBar';
-import AdminCodeSearchBar from '../AdminCodeSearchBar'; 
+import AdminCodeSearchBar from '../AdminCodeSearchBar';
 import ItemActions from './ItemActions';
 import ItemFormModal from './ItemFormModal';
-import { useNavigate } from 'react-router-dom';  
+import { useNavigate } from 'react-router-dom';
 import Pagination from '../../Pagination';
+import { useTranslation } from 'react-i18next';
+import { pickLang } from '../../../utils/i18nHelpers';
+import LanguageSwitcher from '../../LanguageSwitcher';
 
 const ItemsManagement: React.FC = () => {
-  const navigate = useNavigate();  
-  
+  const navigate = useNavigate();
+
   const [categories, setCategories] = useState<AdminCategory[]>([]);
   const [categoriesLoading, setCategoriesLoading] = useState(true);
   const [items, setItems] = useState<AdminItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(''); 
+  const [error, setError] = useState('');
   const [modalError, setModalError] = useState('');
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -26,6 +29,8 @@ const ItemsManagement: React.FC = () => {
   const [codeSearchActive, setCodeSearchActive] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingItem, setEditingItem] = useState<AdminItem | null>(null);
+  const { t } = useTranslation();
+
   const getImageSrc = (url?: string) => {
     return url && url.trim() !== ''
       ? url
@@ -59,10 +64,10 @@ const ItemsManagement: React.FC = () => {
     setNameSearchActive(false);
     setCodeSearchActive(false);
     try {
-      const data = await adminFetchItems({ 
-        page: pageNum, 
-        size: 10, 
-        categoryName: category || undefined 
+      const data = await adminFetchItems({
+        page: pageNum,
+        size: 10,
+        categoryName: category || undefined
       });
       setItems(data.content || []);
       setPage(data.page?.number || 0);
@@ -98,7 +103,7 @@ const ItemsManagement: React.FC = () => {
       setTotalPages(1);
       return;
     }
-    
+
     const adminItems: AdminItem[] = results.map(item => ({
       id: item.id || 0,
       code: item.code,
@@ -107,16 +112,17 @@ const ItemsManagement: React.FC = () => {
       arabicName: item.arabicName,
       arabicDescription: item.arabicDescription || '',
       weight: item.weight,
-      category: { 
-        id: 0, 
-        name: item.categoryName || 'Search Result', 
-        description: '', 
-        imageUrl: null 
+      category: {
+        id: 0,
+        name: item.categoryName || 'Search Result',
+        description: '',
+        arabicName: item.arabicCategoryName,
+        imageUrl: null
       },
-      karat: { 
-        id: 0, 
-        name: item.karatName || 'Unknown', 
-        displayName: `${item.karatName || ''}K` 
+      karat: {
+        id: 0,
+        name: item.karatName || 'Unknown',
+        displayName: `${item.karatName || ''}K`
       },
       factoryPrice: item.factoryPrice,
       imageUrl: item.imageUrl || '',
@@ -128,7 +134,7 @@ const ItemsManagement: React.FC = () => {
       priceAfterDiscount: item.priceAfterDiscount ?? undefined,
       goldPricePerGram: 0,
     }));
-    
+
     setItems(adminItems);
     if (searchType === 'name') {
       setNameSearchActive(true);
@@ -163,7 +169,7 @@ const ItemsManagement: React.FC = () => {
 
   const handleNewItem = () => {
     setEditingItem(null);
-    setModalError(''); 
+    setModalError('');
     setShowForm(true);
   };
 
@@ -178,7 +184,7 @@ const ItemsManagement: React.FC = () => {
       }
     }
     setEditingItem(fullItem);
-    setModalError(''); 
+    setModalError('');
     setShowForm(true);
   };
 
@@ -189,7 +195,7 @@ const ItemsManagement: React.FC = () => {
   };
 
   const handleFormSuccess = async (pageNum: number, category: string) => {
-    setError(''); 
+    setError('');
     setModalError('');
     await fetchItems(pageNum, category);
   };
@@ -206,8 +212,8 @@ const ItemsManagement: React.FC = () => {
           <div className="w-16 h-16 mx-auto bg-gradient-to-br from-gray-200 to-gray-300 rounded-2xl flex items-center justify-center mb-6 shadow-lg animate-pulse">
             <div className="w-8 h-8 bg-white rounded-xl"></div>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Loading Items...</h2>
-          <p className="text-gray-600">Fetching your jewelry inventory</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('admin.items.loadingTitle')}</h2>
+          <p className="text-gray-600">{t('admin.items.loadingSubtitle')}</p>
         </div>
       </div>
     );
@@ -222,29 +228,30 @@ const ItemsManagement: React.FC = () => {
             <div className="flex items-center gap-4">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900">
-                  Items Management
+                  {t('admin.items.title')}
                 </h1>
                 <p className="mt-1 text-lg text-gray-600 font-medium">
-                  Manage your jewelry inventory
+                  {t('admin.items.subtitle')}
                 </p>
               </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-3">
               <button
-                onClick={() => navigate('/admin/dashboard')} 
+                onClick={() => navigate('/admin/dashboard')}
                 className="px-4 py-2 text-sm font-semibold text-gray-800 bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 rounded-xl border border-gray-200 shadow-sm flex items-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
-                Dashboard
+                {t('common.backToDashboard')}
               </button>
               <button
                 onClick={handleNewItem}
                 className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-bold rounded-xl flex items-center gap-2"
               >
-                Add New Item
+                {t('admin.items.addNew')}
               </button>
+              <LanguageSwitcher />
             </div>
           </div>
         </div>
@@ -257,9 +264,9 @@ const ItemsManagement: React.FC = () => {
             {/* Name Search */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              Item Name
+                {t('admin.items.searchByName')}
               </label>
-              <AdminSearchBar 
+              <AdminSearchBar
                 onSearch={(results) => handleSearch('name', results)}
                 onClear={handleClearNameSearch}
               />
@@ -268,9 +275,9 @@ const ItemsManagement: React.FC = () => {
             {/* Code Search */}
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              Item Code
+                {t('admin.items.searchByCode')}
               </label>
-              <AdminCodeSearchBar 
+              <AdminCodeSearchBar
                 onSearch={(results: Item[]) => handleSearch('code', results)}
                 onClear={handleClearCodeSearch}
               />
@@ -278,7 +285,7 @@ const ItemsManagement: React.FC = () => {
 
             {/* Category Filter */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">Filter Category</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-3">{t('admin.items.filterCategory')}</label>
               <select
                 value={categoryFilter}
                 onChange={(e) => {
@@ -292,31 +299,31 @@ const ItemsManagement: React.FC = () => {
                 className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white/50 backdrop-blur-sm shadow-sm disabled:opacity-50"
                 disabled={(nameSearchActive || codeSearchActive) || categoriesLoading}
               >
-                <option value="">All Categories</option>
+                <option value="">{t('admin.items.allCategories')}</option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.name}>
-                    {category.name}
+                    {pickLang(category.name, category.arabicName)}
                   </option>
                 ))}
               </select>
               {categoriesLoading && (
-                <p className="text-xs text-gray-500 mt-1">Loading categories...</p>
+                <p className="text-xs text-gray-500 mt-1"> {t('common.loading')}</p>
               )}
             </div>
           </div>
-          
+
           {/* Search Status */}
           {(nameSearchActive || codeSearchActive) && (
             <div className="mt-6 p-2 bg-amber-50 border border-amber-200 rounded-xl">
               <div className="text-sm font-medium text-amber-700 flex items-center gap-2 justify-between">
-                <span>Showing {items.length} results.
+                <span>{t('admin.items.showingResults', { count: items.length })}
                 </span>
                 <div className="flex gap-2">
-                  <button 
+                  <button
                     onClick={handleClearAllSearch}
                     className="px-3 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-lg hover:bg-red-200"
                   >
-                    Clear
+                    {t('admin.items.clearSearch')}
                   </button>
                 </div>
               </div>
@@ -335,13 +342,13 @@ const ItemsManagement: React.FC = () => {
         {items.length === 0 && !loading ? (
           (nameSearchActive || codeSearchActive) ? (
             <div className="text-center py-20">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">No items found</h3>
-              <p className="text-gray-600 mb-8">Try a different search term</p>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('admin.items.noItems')}</h3>
+              <p className="text-gray-600 mb-8">{t('admin.items.noItemsHint')}</p>
               <button
                 onClick={handleClearAllSearch}
                 className="px-6 py-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-bold rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all duration-300 mx-auto"
               >
-                Clear Search
+                {t('admin.items.clearSearch')}
               </button>
             </div>
           ) : (
@@ -349,13 +356,13 @@ const ItemsManagement: React.FC = () => {
               <div className="mx-auto bg-gradient-to-br from-gray-200 to-gray-300 rounded-3xl flex items-center justify-center mb-6">
                 <span className="text-3xl text-gray-400">📦</span>
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">No items found</h3>
-              <p className="text-gray-600 mb-4">Try adjusting your filters or add new items</p>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">{t('admin.items.noItems')}</h3>
+              <p className="text-gray-600 mb-4">{t('admin.items.noItemsHint')}</p>
               <button
                 onClick={handleNewItem}
                 className="px-6 py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 text-white font-bold rounded-2xl hover:shadow-xl transition-all"
               >
-                Add First Item
+                {t('admin.items.addFirst')}
               </button>
             </div>
           )
@@ -365,16 +372,16 @@ const ItemsManagement: React.FC = () => {
               <table className="w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-10 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Code</th>
-                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Item</th>
-                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Category</th>
-                    <th className="px-2 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Karat</th>
-                    <th className="px-2 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Weight</th>
-                    <th className="px-10 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Stock</th>
-                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Price</th>
-                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Discount</th>
-                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Actions</th>
+                    <th className="px-10 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">{t('admin.items.table.code')}</th>
+                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">{t('admin.items.table.item')}</th>
+                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">{t('admin.items.table.category')}</th>
+                    <th className="px-2 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">{t('admin.items.table.karat')}</th>
+                    <th className="px-2 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">{t('admin.items.table.weight')}</th>
+                    <th className="px-10 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">{t('admin.items.table.stock')}</th>
+                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">{t('admin.items.table.price')}</th>
+                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">{t('admin.items.table.discount')}</th>
+                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">{t('admin.items.table.status')}</th>
+                    <th className="px-6 py-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">{t('admin.items.table.actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -389,44 +396,44 @@ const ItemsManagement: React.FC = () => {
                             className="w-14 h-14 rounded-xl object-cover shadow-md ring-2 ring-gray-200"
                             onError={(e) => {
                               const img = e.currentTarget;
-                              if (img.src.includes('placeholder')) return; 
+                              if (img.src.includes('placeholder')) return;
                               img.src = '/images/placeholder.png';
                             }}
                           />
                           <div className="min-w-0 flex-1">
-                            <p className="font-bold text-sm text-gray-900 truncate">{item.name}</p>
-                            <p className="text-xs text-gray-500 truncate">{item.description}</p>
+                            <p className="font-bold text-sm text-gray-900 truncate">{pickLang(item.name, item.arabicName)}</p>
+                            <p className="text-xs text-gray-500 truncate">{pickLang(item.description, item.arabicDescription)}</p>
                           </div>
                         </div>
                       </td>
                       <td className="px-6 py-6 text-center">
                         <span className="inline-flex px-3 py-1.5 text-xs font-bold bg-gradient-to-r from-blue-100 to-blue-200 text-blue-800 rounded-full shadow-sm">
-                          {item.category.name}
+                          {pickLang(item.category.name, item.category.arabicName)}
                         </span>
                       </td>
                       <td className="px-4 py-6 text-center text-medium text-gray-900">
                         {item.karat.displayName}
                       </td>
-                      <td className="px-6 py-6 text-center text-medium text-gray-900">
+                      <td dir="ltr" className="px-6 py-6 text-center text-medium text-gray-900">
                         {item.weight.toFixed(1)}g
                       </td>
                       <td className="px-6 py-6 text-right">
                         <div>
-                          <span className={`text-medium font-bold ${item.inStockCount > 0 ? 'text-emerald-600' : 'text-amber-600'}`}>
+                          <span dir="ltr" className={`text-medium font-bold ${item.inStockCount > 0 ? 'text-emerald-600' : 'text-amber-600'}`}>
                             {item.inStockCount}
                           </span>
                           {item.reservedCount >= 0 && (
-                            <p className="text-xs text-gray-500 mt-1">({item.reservedCount} reserved)</p>
+                            <p className="text-xs text-gray-500 mt-1">({t('admin.items.table.reserved', { count: item.reservedCount })})</p>
                           )}
                         </div>
                       </td>
                       <td className="px-6 py-6 text-right">
                         <div>
-                          <p className="text-lg font-semibold text-gray-900">
+                          <p dir="ltr" className="text-lg font-semibold text-gray-900">
                             ${item.priceBeforeDiscount?.toFixed(2) || '0.00'}
                           </p>
                           {item.discountPercentage && item.priceAfterDiscount && (
-                            <p className="text-sm text-emerald-600 font-semibold">
+                            <p dir="ltr" className="text-sm text-emerald-600 font-semibold">
                               ${item.priceAfterDiscount.toFixed(2)}
                             </p>
                           )}
@@ -435,27 +442,26 @@ const ItemsManagement: React.FC = () => {
                       <td className="px-6 py-6 text-center">
                         <div>
                           {item.discountPercentage ? (
-                            <p className="text-sm text-emerald-600 font-semibold">
+                            <p dir="ltr" className="text-sm text-emerald-600 font-semibold">
                               % {item.discountPercentage.toFixed(1)}
                             </p>
                           ) : (
-                            <p className="text-sm text-emerald-600 font-semibold">
+                            <p dir="ltr" className="text-sm text-emerald-600 font-semibold">
                               % 0.0
                             </p>
                           )}
                         </div>
                       </td>
                       <td className="px-6 py-3 text-center">
-                        <span className={`inline-flex px-3 py-1 text-xs font-bold rounded-full shadow-sm border-2 ${
-                          item.isActive 
-                            ? 'bg-emerald-100 border-emerald-300 text-emerald-800' 
-                            : 'bg-gray-100 border-gray-300 text-gray-700'
-                        }`}>
-                          {item.isActive ? 'Active' : 'Inactive'}
+                        <span className={`inline-flex px-3 py-1 text-xs font-bold rounded-full shadow-sm border-2 ${item.isActive
+                          ? 'bg-emerald-100 border-emerald-300 text-emerald-800'
+                          : 'bg-gray-100 border-gray-300 text-gray-700'
+                          }`}>
+                          {item.isActive ? t('admin.items.status.active') : t('admin.items.status.inactive')}
                         </span>
                       </td>
                       <td className="px-6 py-6 text-center">
-                        <ItemActions 
+                        <ItemActions
                           item={item}
                           onEdit={handleEdit}
                           fetchItems={fetchItems}
@@ -494,8 +500,8 @@ const ItemsManagement: React.FC = () => {
         onSubmitSuccess={handleFormSuccess}
         page={page}
         categoryFilter={categoryFilter}
-        modalError={modalError}      
-        setModalError={setModalError} 
+        modalError={modalError}
+        setModalError={setModalError}
       />
     </div>
   );

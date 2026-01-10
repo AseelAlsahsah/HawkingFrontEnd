@@ -1,7 +1,8 @@
-// src/components/admin/AdminDashboard.tsx
 import React, { useState } from 'react';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../LanguageSwitcher';
 
 /* ----------------------------- COLOR MAP ----------------------------- */
 const actionColorClasses: Record<
@@ -37,15 +38,17 @@ const actionColorClasses: Record<
 const AdminDashboard: React.FC = () => {
   const { logout, user } = useAdminAuth();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const { t } = useTranslation();
 
   const quickActions = [
-    { label: 'Items', path: '/admin/items', color: 'amber' },
-    { label: 'Karats', path: '/admin/karats', color: 'indigo' },
-    { label: 'Categories', path: '/admin/categories', color: 'yellow' },
-    { label: 'Gold Prices', path: '/admin/gold-prices', color: 'emerald' },
-    { label: 'Reservations', path: '/admin/reservations', color: 'purple' },
-    { label: 'Discounts', path: '/admin/discounts', color: 'rose' },
+    { labelKey: 'items', path: '/admin/items', color: 'amber' },
+    { labelKey: 'karats', path: '/admin/karats', color: 'indigo' },
+    { labelKey: 'categories', path: '/admin/categories', color: 'yellow' },
+    { labelKey: 'goldPrices', path: '/admin/gold-prices', color: 'emerald' },
+    { labelKey: 'reservations', path: '/admin/reservations', color: 'purple' },
+    { labelKey: 'discounts', path: '/admin/discounts', color: 'rose' },
   ];
+
 
   const handleLogout = async () => {
     await logout();
@@ -59,22 +62,26 @@ const AdminDashboard: React.FC = () => {
         <div className="max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">
-              Admin Dashboard
+              {t('admin.dashboard.title')}
             </h1>
             <p className="text-sm text-gray-500 mt-1">
-              Welcome,{' '}
-              <span className="font-semibold text-amber-600">
+              {t('admin.dashboard.welcome')}{' '}
+              <span className="font-semibold text-amber-600" dir="ltr">
                 {user?.username}
               </span>
             </p>
           </div>
 
-          <button
-            onClick={() => setShowLogoutModal(true)}
-            className="px-4 py-2 text-sm font-semibold border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition"
-          >
-            Log out
-          </button>
+          <div className="flex items-center gap-4">
+
+            <button
+              onClick={() => setShowLogoutModal(true)}
+              className="px-4 py-2 text-sm font-semibold border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition"
+            >
+              {t('admin.dashboard.logout')}
+            </button>
+            <LanguageSwitcher />
+          </div>
         </div>
       </header>
 
@@ -83,10 +90,10 @@ const AdminDashboard: React.FC = () => {
         {/* Section title */}
         <div className="mb-8">
           <h2 className="text-xl font-bold text-gray-900">
-            Management
+            {t('admin.dashboard.management')}
           </h2>
           <p className="text-sm text-gray-500">
-            Access and manage system resources
+            {t('admin.dashboard.managementSubtitle')}
           </p>
         </div>
 
@@ -94,6 +101,7 @@ const AdminDashboard: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {quickActions.map(action => {
             const colors = actionColorClasses[action.color];
+            const label = t(`admin.dashboard.actions.${action.labelKey}`);
 
             return (
               <Link
@@ -103,7 +111,7 @@ const AdminDashboard: React.FC = () => {
               >
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-bold text-gray-900">
-                    {action.label}
+                    {label}
                   </h3>
                   <span
                     className={`inline-flex items-center justify-center w-10 h-10 rounded-lg font-bold ${colors.bg} ${colors.text}`}
@@ -112,7 +120,7 @@ const AdminDashboard: React.FC = () => {
                   </span>
                 </div>
                 <p className="text-sm text-gray-500">
-                  Manage {action.label.toLowerCase()} settings and data
+                  {t('admin.dashboard.manage')} {label}
                 </p>
               </Link>
             );
@@ -126,10 +134,10 @@ const AdminDashboard: React.FC = () => {
           <div className="bg-white rounded-xl shadow-2xl max-w-md w-full border border-gray-200">
             <div className="p-6">
               <h3 className="text-xl font-bold text-gray-900 mb-3">
-                Confirm logout
+                {t('admin.dashboard.confirmLogout')}
               </h3>
               <p className="text-sm text-gray-600 mb-6">
-                Are you sure you want to log out?
+                {t('admin.dashboard.confirmLogoutText')}
               </p>
 
               <div className="flex gap-3">
@@ -137,13 +145,13 @@ const AdminDashboard: React.FC = () => {
                   onClick={handleLogout}
                   className="flex-1 bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg font-semibold"
                 >
-                  Log out
+                  {t('admin.dashboard.logout')}
                 </button>
                 <button
                   onClick={() => setShowLogoutModal(false)}
                   className="flex-1 bg-gray-100 hover:bg-gray-200 py-2 rounded-lg font-semibold"
                 >
-                  Cancel
+                   {t('common.cancel')}
                 </button>
               </div>
             </div>

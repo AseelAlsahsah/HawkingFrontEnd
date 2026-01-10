@@ -4,7 +4,7 @@ const publicApi = axios.create({
   baseURL: "/api/v1",
 });
 
-publicApi .interceptors.request.use(
+publicApi.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("adminToken");
     if (token) {
@@ -55,16 +55,17 @@ export interface AdminItem {
   arabicName: string;
   arabicDescription: string;
   weight: number;
-  category: { 
-    id: number; 
-    name: string; 
-    description: string; 
-    imageUrl: string | null 
+  category: {
+    id: number;
+    name: string;
+    description: string;
+    arabicName: string;
+    imageUrl: string | null
   };
-  karat: { 
-    id: number; 
-    name: string; 
-    displayName: string 
+  karat: {
+    id: number;
+    name: string;
+    displayName: string
   };
   factoryPrice: number;
   imageUrl: string;
@@ -116,20 +117,20 @@ export async function adminUpdateItem(id: number, item: Partial<AdminItem>) {
   return response.data;
 }
 
-export async function adminDeactivateItem(code: string) { 
-  await publicApi.delete(`/items/code/${code}`); 
+export async function adminDeactivateItem(code: string) {
+  await publicApi.delete(`/items/code/${code}`);
 }
 
-export async function adminDeleteItem(id: number) { 
-  await publicApi.delete(`/items/${id}`); 
+export async function adminDeleteItem(id: number) {
+  await publicApi.delete(`/items/${id}`);
 }
 // ------------------------ admin categories ----------------------
 export interface AdminCategory {
   id: number;
   name: string;
   description: string;
-  arabicName: string;
-  arabicDescription: string;
+  arabicName?: string;
+  arabicDescription?: string;
 }
 
 export interface AdminCategoriesResponse {
@@ -237,7 +238,7 @@ export async function adminCreateGoldPrice(goldPrice: {
 }
 
 export async function adminUpdateGoldPrice(
-  id: number, 
+  id: number,
   goldPrice: Partial<AdminGoldPrice>
 ): Promise<AdminGoldPrice> {
   const response = await publicApi.put<AdminGoldPrice>(`/gold-price/${id}`, goldPrice);
@@ -256,6 +257,8 @@ export interface ReservationItemDetail {
     code: string;
     name: string;
     description: string;
+    arabicName: string;
+    arabicDescription: string;
     category: { id: number; name: string; description: string };
     karat: { id: number; name: string; displayName: string };
     imageUrl: string;
@@ -313,6 +316,8 @@ export interface AdminDiscountItem {
   code: string;
   name: string;
   description: string;
+  arabicName: string;
+  arabicDescription: string;
   imageUrl: string;
   weight: number;
   inStockCount: number;
